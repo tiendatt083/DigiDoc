@@ -75,8 +75,8 @@ public class DocumentServiceImpl implements DocumentService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        // ── File PDF/tài liệu → lưu local (để FileDownloadController phục vụ download)
-        String originalFileName = fileStorageService.storeFile(request.getFile(), "doc");
+        // ── File PDF/tài liệu → upload lên Cloudinary để không bị mất khi Render restart
+        String originalFileName = cloudinaryService.uploadDocument(request.getFile());
 
         // ── Ảnh thumbnail → upload lên Cloudinary (URL vĩnh viễn, không mất khi redeploy)
         String thumbnailUrl = null;

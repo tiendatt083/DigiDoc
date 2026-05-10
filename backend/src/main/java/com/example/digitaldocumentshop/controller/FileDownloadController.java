@@ -81,9 +81,16 @@ public class FileDownloadController {
                 .build();
         downloadLogRepository.save(log);
 
-        Path filePath = fileStorageService.loadFileAsResource(document.getOriginalFilePath());
-        
         try {
+            // Nếu là link Cloudinary (lưu trữ trên mây)
+            if (document.getOriginalFilePath().startsWith("http")) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FOUND)
+                        .header(HttpHeaders.LOCATION, document.getOriginalFilePath())
+                        .build();
+            }
+
+            // Fallback: Nếu là file cũ lưu ở ổ cứng (local)
+            Path filePath = fileStorageService.loadFileAsResource(document.getOriginalFilePath());
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
                 String originalFileName = filePath.getFileName().toString();
