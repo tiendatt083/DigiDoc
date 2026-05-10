@@ -14,7 +14,7 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            String adminEmail = "Nguyendat20041973@gmail.com";
+            String adminEmail = "nguyendat20041973@gmail.com";
             if (!userRepository.existsByEmail(adminEmail)) {
                 User admin = User.builder()
                         .email(adminEmail)

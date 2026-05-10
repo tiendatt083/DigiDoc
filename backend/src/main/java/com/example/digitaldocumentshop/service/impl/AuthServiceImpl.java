@@ -56,8 +56,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
+        String lowercaseEmail = loginRequest.getEmail() != null ? loginRequest.getEmail().toLowerCase() : null;
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(lowercaseEmail, loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -84,12 +85,14 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Mật khẩu phải có từ 6 ký tự trở lên.");
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        String lowercaseEmail = signUpRequest.getEmail() != null ? signUpRequest.getEmail().toLowerCase() : null;
+
+        if (userRepository.existsByEmail(lowercaseEmail)) {
             throw new RuntimeException("Tài khoản đã được đăng kí, vui lòng đăng nhập.");
         }
 
         User user = User.builder()
-                .email(signUpRequest.getEmail())
+                .email(lowercaseEmail)
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .fullName(signUpRequest.getFullName())
                 .phoneNumber(signUpRequest.getPhoneNumber())
@@ -104,7 +107,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void processForgotPassword(String email) {
-        User user = userRepository.findByEmail(email)
+        String lowercaseEmail = email != null ? email.toLowerCase() : null;
+        User user = userRepository.findByEmail(lowercaseEmail)
                 .orElseThrow(() -> new RuntimeException("Error: User not found with this email."));
 
         // Generate 6-digit OTP
@@ -138,14 +142,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void resetPassword(String email, String otp, String newPassword) {
-        OtpToken otpToken = otpTokenRepository.findByEmailAndOtpCode(email, otp)
+        String lowercaseEmail = email != null ? email.toLowerCase() : null;
+        OtpToken otpToken = otpTokenRepository.findByEmailAndOtpCode(lowercaseEmail, otp)
                 .orElseThrow(() -> new RuntimeException("Error: Invalid OTP."));
 
         if (otpToken.getIsUsed() || otpToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Error: OTP is invalid or expired.");
         }
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(lowercaseEmail)
                 .orElseThrow(() -> new RuntimeException("Error: User not found."));
 
         user.setPassword(encoder.encode(newPassword));
@@ -169,7 +174,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
             GoogleIdToken.Payload payload = idToken.getPayload();
-            String email = payload.getEmail();
+            String email = payload.getEmail() != null ? payload.getEmail().toLowerCase() : null;
             String name = (String) payload.get("name");
 
             User user = userRepository.findByEmail(email).orElseGet(() -> {
