@@ -1,0 +1,26 @@
+# Java/Spring Boot
+backend/target/
+backend/*.jar
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Node/React
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.DS_Store
+
+# Logs & Temp
+logs/
+*.log
+uploads/
+
+# OS
+Thumbs.db

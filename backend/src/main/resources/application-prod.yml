@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: digital-document-shop
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+jwt:
+  secret: ${JWT_SECRET}
+  expirationMs: 86400000
+
+app:
+  upload-dir: ${UPLOAD_DIR:/app/uploads}
+  frontend-url: ${FRONTEND_URL}
+  transfer-prefix: DIGIDOC
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+
+sepay:
+  api-key: ${SEPAY_API_KEY}
+  webhook-token: ${SEPAY_WEBHOOK_TOKEN}
+
+bank:
+  id: "970423"
+  account-number: ${BANK_ACCOUNT_NUMBER}
+  account-name: ${BANK_ACCOUNT_NAME}
+  display-name: ${BANK_DISPLAY_NAME:TPBank (Tien Phong Bank)}
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+
+server:
+  port: ${PORT:8080}

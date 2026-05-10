@@ -1,0 +1,3 @@
+# Railway/Render/Vercel — chọn 1 runtime để build
+# Dùng cho Railway khi deploy backend (Spring Boot)
+web: java -Dspring.profiles.active=prod -jar target/digitaldocumentshop-0.0.1-SNAPSHOT.jar

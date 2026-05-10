@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: digital-document-shop
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: nguyendat20041973@gmail.com
+    password: dzgelhwdxyizznbg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/digital_document_shop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+jwt:
+  secret: aGV5X3RoaXNfaXNfYV92ZXJ5X3NlY3JldF9rZXlfZm9yX2p3dF9hdXRoZW50aWNhdGlvbl9wbGVhc2VfY2hhbmdlX2l0X2luX3Byb2R1Y3Rpb24=
+  expirationMs: 86400000 # 24 hours
+
+app:
+  upload-dir: uploads
+  frontend-url: http://localhost:5173
+  # Prefix nội dung chuyển khoản - người dùng phải ghi "DIGIDOC <orderCode>"
+  transfer-prefix: DIGIDOC
+
+google:
+  client-id: 1086823449607-8238vrl3is10ab3jd3mf0sep18qtcsq0.apps.googleusercontent.com
+
+# =============================================
+# Cấu hình SePay (điền vào sau khi đăng ký)
+# =============================================
+sepay:
+  # API Key lấy từ sepay.vn → Cài đặt → API Key
+  api-key: F49VFE1UECHFYB1RDHOS97UTWP4R3SJZMNEIW6B2LKID8HHG75RGVWASXQBAQKD2
+  # Webhook token = API Key (SePay dùng cùng 1 key)
+  webhook-token: F49VFE1UECHFYB1RDHOS97UTWP4R3SJZMNEIW6B2LKID8HHG75RGVWASXQBAQKD2
+
+# =============================================
+# Thông tin tài khoản ngân hàng của bạn
+# =============================================
+bank:
+  # TPBank (Tien Phong Bank)
+  id: "970423"
+  account-number: 07480066036
+  account-name: NGUYEN TIEN DAT
+  display-name: TPBank (Tien Phong Bank)
+
+# =============================================
+# Cloudinary — lưu ảnh thumbnail trên cloud
+# Đăng ký tại cloudinary.com (miễn phí 25GB)
+# =============================================
+cloudinary:
+  cloud-name: DiGiDoc
+  api-key: 483941893776224
+  api-secret: MszKNq1XmyHzG09wmNyPzq5nbqE
+
+server:
+  port: 8080
+  error:
+    include-message: always
