@@ -31,7 +31,7 @@ const CartPage = () => {
     const selectedItems = items.filter(i => selectedIds.has(i.id));
 
     const subtotal = selectedItems.reduce((acc, item) => {
-        const price = item.document?.salePrice || item.document?.price || 0;
+        const price = (item.document?.salePrice != null ? item.document.salePrice : item.document?.price) || 0;
         return acc + (price * item.quantity);
     }, 0);
 
@@ -135,7 +135,7 @@ const CartPage = () => {
                     </div>
 
                     {items.map((item) => {
-                        const price = item.document.salePrice || item.document.price;
+                        const price = (item.document.salePrice != null ? item.document.salePrice : item.document.price);
                         const isSelected = selectedIds.has(item.id);
                         return (
                             <div key={item.id} className={`bg-white p-4 sm:p-6 rounded-xl shadow-sm border transition-all flex flex-col sm:flex-row gap-6 items-center ${isSelected ? 'border-indigo-300 bg-indigo-50/30' : 'border-slate-100'}`}>
@@ -160,7 +160,7 @@ const CartPage = () => {
                                     <p className="text-sm text-slate-500 mb-2">{item.document.categoryName || 'Chưa phân loại'}</p>
                                     <div className="flex items-center gap-2">
                                         <span className="text-lg font-semibold text-indigo-700">{formatPrice(price)}</span>
-                                        {item.document.salePrice && (
+                                        {item.document.salePrice != null && (
                                             <span className="text-sm text-slate-400 line-through">{formatPrice(item.document.price)}</span>
                                         )}
                                     </div>

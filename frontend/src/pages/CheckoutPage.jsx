@@ -28,7 +28,7 @@ const CheckoutPage = () => {
     const selectedItems = items.filter(i => selectedItemIds.has(i.id));
 
     const subtotal = selectedItems.reduce((acc, item) => {
-        const price = item.document.salePrice || item.document.price;
+        const price = (item.document.salePrice != null ? item.document.salePrice : item.document.price);
         return acc + (price * item.quantity);
     }, 0);
 
@@ -89,7 +89,7 @@ const CheckoutPage = () => {
                                 )}
                                 <span className="text-sm font-medium text-slate-800">{item.document.title} <span className="text-slate-400">× {item.quantity}</span></span>
                             </div>
-                            <span className="font-semibold text-slate-700">{formatPrice((item.document.salePrice || item.document.price) * item.quantity)}</span>
+                            <span className="font-semibold text-slate-700">{formatPrice(((item.document.salePrice != null ? item.document.salePrice : item.document.price)) * item.quantity)}</span>
                         </div>
                     ))}
                 </div>

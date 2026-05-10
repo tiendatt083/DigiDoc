@@ -10,6 +10,7 @@ const DocumentDetailPage = () => {
     const { slug } = useParams();
     const [doc, setDoc] = useState(null);
     const [reviews, setReviews] = useState([]);
+    const [relatedDocs, setRelatedDocs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeImage, setActiveImage] = useState(null);
     const { addToCart } = useCartStore();
@@ -26,6 +27,11 @@ const DocumentDetailPage = () => {
                 if (res.data && res.data.id) {
                     const revRes = await api.get(`/reviews/document/${res.data.id}`);
                     setReviews(revRes.data || []);
+                    
+                    try {
+                        const relRes = await api.get(`/documents/${res.data.id}/related`);
+                        setRelatedDocs(relRes.data || []);
+                    } catch(e){}
                 }
             } catch (err) {
                 console.error("Failed to fetch document detail", err);
@@ -51,7 +57,7 @@ const DocumentDetailPage = () => {
     if (loading) return <div className="flex justify-center items-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div></div>;
     if (!doc) return <div className="text-center py-20"><h2 className="text-2xl font-bold text-slate-800">Không tìm thấy sản phẩm</h2></div>;
 
-    const price = doc.salePrice || doc.price;
+    const price = (doc.salePrice != null ? doc.salePrice : doc.price);
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -113,7 +119,7 @@ const DocumentDetailPage = () => {
                         <div className="mb-8">
                             <div className="flex items-end gap-3 mb-2">
                                 <span className="text-4xl font-black text-indigo-600">{formatPrice(price)}</span>
-                                {doc.salePrice && <span className="text-xl text-slate-400 line-through mb-1">{formatPrice(doc.price)}</span>}
+                                {doc.salePrice != null && <span className="text-xl text-slate-400 line-through mb-1">{formatPrice(doc.price)}</span>}
                             </div>
                             <p className="text-sm text-emerald-600 flex items-center gap-1 font-medium"><CheckCircle size={16} /> Truy cập tức thì qua Tải xuống</p>
                         </div>
@@ -123,12 +129,14 @@ const DocumentDetailPage = () => {
                         </div>
                         
                         <div className="mt-auto pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                            <button 
-                                onClick={handleAddToCart}
-                                className="flex-1 bg-indigo-600 text-white font-bold py-4 px-8 rounded-lg shadow-md hover:bg-indigo-700 transition flex items-center justify-center gap-2"
-                            >
-                                <ShoppingCart size={20} /> Thêm vào giỏ hàng
-                            </button>
+                            {(!user || !user.roles?.includes('ROLE_ADMIN')) && (
+                                <button 
+                                    onClick={handleAddToCart}
+                                    className="flex-1 bg-indigo-600 text-white font-bold py-4 px-8 rounded-lg shadow-md hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+                                >
+                                    <ShoppingCart size={20} /> Thêm vào giỏ hàng
+                                </button>
+                            )}
                         </div>
                         
                         <div className="mt-6 flex items-center gap-6 text-sm text-slate-500">
@@ -181,6 +189,38 @@ const DocumentDetailPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Related Products */}
+            {relatedDocs.length > 0 && (
+                <div className="mt-16">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-6 font-[Space Grotesk]">Gợi ý các sản phẩm khác</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {relatedDocs.map(item => {
+                            const price = item.salePrice != null ? item.salePrice : item.price;
+                            return (
+                                <Link to={`/documents/${item.slug}`} key={item.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all block text-decoration-none group">
+                                    <div className="aspect-[4/3] rounded-xl mb-4 overflow-hidden bg-slate-100 relative">
+                                        {item.thumbnailPath ? (
+                                            <img src={getUploadUrl(item.thumbnailPath)} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                                <FileText size={40} />
+                                            </div>
+                                        )}
+                                        {item.salePrice != null && Number(item.salePrice) < Number(item.price) && (
+                                            <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg">SALE</div>
+                                        )}
+                                    </div>
+                                    <h4 className="font-bold text-slate-800 text-lg mb-2 line-clamp-2">{item.title}</h4>
+                                    <div className="flex justify-between items-center mt-3">
+                                        <div className="text-indigo-600 font-bold">{formatPrice(price)}</div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

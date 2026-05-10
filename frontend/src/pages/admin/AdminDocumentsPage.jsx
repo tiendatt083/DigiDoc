@@ -115,7 +115,7 @@ export default function AdminDocumentsPage() {
       shortDescription: doc.shortDescription || '',
       description: doc.description || '',
       price: doc.price ? String(doc.price) : '',
-      salePrice: doc.salePrice ? String(doc.salePrice) : '',
+      salePrice: doc.salePrice != null ? String(doc.salePrice) : '',
       categoryId: doc.categoryId ? String(doc.categoryId) : '',
       status: doc.status || 'ACTIVE',
       file: null,
@@ -285,7 +285,7 @@ export default function AdminDocumentsPage() {
                   <td style={{ color: '#94a3b8', fontSize: 13 }}>{doc.categoryName || '—'}</td>
                   <td>
                     <div>
-                      {doc.salePrice && Number(doc.salePrice) < Number(doc.price) ? (
+                      {doc.salePrice != null && Number(doc.salePrice) < Number(doc.price) ? (
                         <>
                           <p style={{ color: '#f87171', fontWeight: 700, margin: 0, fontSize: 13 }}>{formatVND(doc.salePrice)}</p>
                           <p style={{ color: '#64748b', margin: 0, fontSize: 11, textDecoration: 'line-through' }}>{formatVND(doc.price)}</p>

@@ -20,12 +20,14 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
+    private final com.example.digitaldocumentshop.service.VoucherService voucherService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, CartItemRepository cartItemRepository, UserRepository userRepository, DocumentRepository documentRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CartItemRepository cartItemRepository, UserRepository userRepository, DocumentRepository documentRepository, com.example.digitaldocumentshop.service.VoucherService voucherService) {
         this.orderRepository = orderRepository;
         this.cartItemRepository = cartItemRepository;
         this.userRepository = userRepository;
         this.documentRepository = documentRepository;
+        this.voucherService = voucherService;
     }
 
     @Override
@@ -52,16 +54,34 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal discountAmount = BigDecimal.ZERO;
         int usedPoints = 0;
-        if (request.getUseRewardPoints() != null && request.getUseRewardPoints() > 0) {
-            // New logic: 1 point = 1,000 VND. Can only pay if points cover the entire amount.
-            int requiredPoints = totalAmount.intValue() / 1000;
-            if (user.getRewardPoints() < requiredPoints) {
-                throw new RuntimeException("Không đủ điểm thưởng để thanh toán toàn bộ hóa đơn này (cần " + requiredPoints + " điểm)");
+        
+        // --- 1. Áp dụng Voucher trước ---
+        if (request.getVoucherCode() != null && !request.getVoucherCode().isEmpty()) {
+            Voucher voucher = voucherService.applyVoucher(request.getVoucherCode(), totalAmount);
+            if (voucher.getDiscountType() == com.example.digitaldocumentshop.enums.DiscountType.PERCENT) {
+                BigDecimal voucherDiscount = totalAmount.multiply(voucher.getDiscountValue()).divide(BigDecimal.valueOf(100));
+                if (voucher.getMaxDiscountAmount() != null) {
+                    voucherDiscount = voucherDiscount.min(voucher.getMaxDiscountAmount());
+                }
+                discountAmount = discountAmount.add(voucherDiscount);
+            } else {
+                discountAmount = discountAmount.add(voucher.getDiscountValue().min(totalAmount));
             }
-            discountAmount = totalAmount; // Full discount
-            usedPoints = requiredPoints;
-            user.setRewardPoints(user.getRewardPoints() - requiredPoints);
-            userRepository.save(user);
+        }
+        
+        // --- 2. Áp dụng Điểm thưởng (nếu có) ---
+        if (request.getUseRewardPoints() != null && request.getUseRewardPoints() > 0) {
+            BigDecimal remainingAmount = totalAmount.subtract(discountAmount);
+            if (remainingAmount.compareTo(BigDecimal.ZERO) > 0) {
+                int requiredPoints = remainingAmount.intValue() / 1000;
+                if (user.getRewardPoints() < requiredPoints) {
+                    throw new RuntimeException("Không đủ điểm thưởng để thanh toán hóa đơn này (cần " + requiredPoints + " điểm)");
+                }
+                discountAmount = discountAmount.add(remainingAmount); // Full discount of remaining
+                usedPoints = requiredPoints;
+                user.setRewardPoints(user.getRewardPoints() - requiredPoints);
+                userRepository.save(user);
+            }
         }
 
         BigDecimal finalAmount = totalAmount.subtract(discountAmount);

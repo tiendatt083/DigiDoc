@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { Search, ShoppingCart, ArrowUpDown, BookOpen, Filter, Star, ChevronDown } from 'lucide-react';
 import { useCartStore } from '../context/cartStore';
+import { useAuthStore } from '../context/authStore';
 
 const DocumentListPage = () => {
+    const { user } = useAuthStore();
     const [documents, setDocuments] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -39,8 +41,8 @@ const DocumentListPage = () => {
             const matchCategory = selectedCategory === '' || doc.categoryName === selectedCategory;
             return matchSearch && matchCategory;
         });
-        if (sortOrder === 'asc') result = [...result].sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
-        else if (sortOrder === 'desc') result = [...result].sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+        if (sortOrder === 'asc') result = [...result].sort((a, b) => ((a.salePrice != null ? a.salePrice : a.price)) - ((b.salePrice != null ? b.salePrice : b.price)));
+        else if (sortOrder === 'desc') result = [...result].sort((a, b) => ((b.salePrice != null ? b.salePrice : b.price)) - ((a.salePrice != null ? a.salePrice : a.price)));
         return result;
     }, [documents, searchTerm, selectedCategory, sortOrder]);
 
@@ -166,7 +168,7 @@ const DocumentListPage = () => {
                                             <span style={{ color: '#1e2d5a', fontSize: 11 }}>Chưa có ảnh</span>
                                         </div>
                                     )}
-                                    {doc.salePrice && (
+                                    {doc.salePrice != null && (
                                         <div style={{ position: 'absolute', top: 10, left: 10, background: 'linear-gradient(135deg,#ef4444,#ec4899)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 6, letterSpacing: 0.5 }}>SALE</div>
                                     )}
                                     {doc.categoryName && (
@@ -202,7 +204,7 @@ const DocumentListPage = () => {
                                     {/* Price + Cart */}
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <div>
-                                            {doc.salePrice ? (
+                                            {doc.salePrice != null ? (
                                                 <div>
                                                     <span style={{ color: '#f87171', fontWeight: 800, fontSize: 16 }}>{formatPrice(doc.salePrice)}</span>
                                                     <span style={{ color: '#334155', fontSize: 11, textDecoration: 'line-through', marginLeft: 7 }}>{formatPrice(doc.price)}</span>
@@ -211,15 +213,17 @@ const DocumentListPage = () => {
                                                 <span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16 }}>{formatPrice(doc.price)}</span>
                                             )}
                                         </div>
-                                        <button
-                                            onClick={e => { e.preventDefault(); e.stopPropagation(); addToCart(doc.id, 1); }}
-                                            style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', color: '#6366f1', cursor: 'pointer', transition: 'all 0.2s' }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = '#6366f1'; e.currentTarget.style.color = '#fff'; }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.color = '#6366f1'; }}
-                                            title="Thêm vào giỏ hàng"
-                                        >
-                                            <ShoppingCart size={16} />
-                                        </button>
+                                        {(!user || !user.roles?.includes('ROLE_ADMIN')) && (
+                                            <button
+                                                onClick={e => { e.preventDefault(); e.stopPropagation(); addToCart(doc.id, 1); }}
+                                                style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', color: '#6366f1', cursor: 'pointer', transition: 'all 0.2s' }}
+                                                onMouseEnter={e => { e.currentTarget.style.background = '#6366f1'; e.currentTarget.style.color = '#fff'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.color = '#6366f1'; }}
+                                                title="Thêm vào giỏ hàng"
+                                            >
+                                                <ShoppingCart size={16} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </Link>

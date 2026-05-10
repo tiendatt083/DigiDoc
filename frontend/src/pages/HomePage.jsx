@@ -132,7 +132,7 @@ const HomePage = () => {
                                             <BookOpen size={40} color="#2d2d6b" />
                                         </div>
                                     )}
-                                    {doc.salePrice && (
+                                    {doc.salePrice != null && (
                                         <div style={{
                                             position: 'absolute', top: 10, left: 10,
                                             background: 'linear-gradient(135deg,#ef4444,#ec4899)',
@@ -158,7 +158,7 @@ const HomePage = () => {
                                     </p>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <div>
-                                            {doc.salePrice ? (
+                                            {doc.salePrice != null ? (
                                                 <>
                                                     <span style={{ color: '#f87171', fontWeight: 800, fontSize: 15 }}>{formatPrice(doc.salePrice)}</span>
                                                     <span style={{ color: '#475569', fontSize: 11, textDecoration: 'line-through', marginLeft: 6 }}>{formatPrice(doc.price)}</span>
