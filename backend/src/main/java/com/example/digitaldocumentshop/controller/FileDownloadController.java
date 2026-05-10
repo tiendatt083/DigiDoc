@@ -82,23 +82,37 @@ public class FileDownloadController {
         downloadLogRepository.save(log);
 
         try {
+            Resource resource;
+            String originalFileName = document.getOriginalFilePath();
+            
             // Nếu là link Cloudinary (lưu trữ trên mây)
-            if (document.getOriginalFilePath().startsWith("http")) {
-                return ResponseEntity.status(org.springframework.http.HttpStatus.FOUND)
-                        .header(HttpHeaders.LOCATION, document.getOriginalFilePath())
-                        .build();
+            if (originalFileName.startsWith("http")) {
+                resource = new UrlResource(originalFileName);
+            } else {
+                // Fallback: Nếu là file cũ lưu ở ổ cứng (local)
+                Path filePath = fileStorageService.loadFileAsResource(originalFileName);
+                resource = new UrlResource(filePath.toUri());
+                originalFileName = filePath.getFileName().toString();
             }
 
-            // Fallback: Nếu là file cũ lưu ở ổ cứng (local)
-            Path filePath = fileStorageService.loadFileAsResource(document.getOriginalFilePath());
-            Resource resource = new UrlResource(filePath.toUri());
-            if(resource.exists()) {
-                String originalFileName = filePath.getFileName().toString();
+            if (resource.exists() || resource.isReadable()) {
                 String extension = "";
                 int i = originalFileName.lastIndexOf('.');
                 if (i > 0) {
                     extension = originalFileName.substring(i);
                 }
+                
+                // Xử lý extension cho Cloudinary nếu bị mất đuôi
+                if (extension.isEmpty() || extension.length() > 5) {
+                    if ("application/pdf".equals(document.getFileType())) {
+                        extension = ".pdf";
+                    } else if ("application/msword".equals(document.getFileType()) || document.getFileType().contains("word")) {
+                        extension = ".docx";
+                    } else {
+                        extension = ".zip";
+                    }
+                }
+
                 String downloadName = document.getTitle();
                 if (!downloadName.endsWith(extension)) {
                     downloadName += extension;
@@ -109,7 +123,7 @@ public class FileDownloadController {
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadName + "\"")
                         .body(resource);
             } else {
-                throw new RuntimeException("File not found");
+                throw new RuntimeException("File not found on server or cloud");
             }
         } catch (Exception ex) {
             throw new RuntimeException("File not found", ex);
