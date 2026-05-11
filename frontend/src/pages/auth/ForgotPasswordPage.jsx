@@ -13,24 +13,17 @@ const ForgotPasswordPage = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const getErrorMessage = (err, fallback = 'Có lỗi xảy ra') => {
-        if (err.code === 'ECONNABORTED') {
-            return 'Gửi OTP quá lâu. Vui lòng kiểm tra cấu hình email SMTP hoặc thử lại sau.';
-        }
-        return err.response?.data?.message || err.response?.data?.error || fallback;
-    };
-
     const handleSendOtp = async (e) => {
         e.preventDefault();
         setError(''); setMessage(''); setLoading(true);
         try {
             const normalizedEmail = email.trim().toLowerCase();
-            const res = await api.post('/auth/forgot-password', { email: normalizedEmail }, { timeout: 30000 });
+            const res = await api.post('/auth/forgot-password', { email: normalizedEmail });
             setEmail(normalizedEmail);
             setMessage(res.data.message);
             setStep(2);
         } catch (err) {
-            setError(getErrorMessage(err));
+            setError(err.response?.data?.message || 'Có lỗi xảy ra');
         } finally {
             setLoading(false);
         }
@@ -44,7 +37,7 @@ const ForgotPasswordPage = () => {
             setMessage('OTP hợp lệ. Vui lòng nhập mật khẩu mới.');
             setStep(3);
         } catch (err) {
-            setError(getErrorMessage(err, 'OTP không hợp lệ'));
+            setError(err.response?.data?.message || 'OTP không hợp lệ');
         } finally {
             setLoading(false);
         }
@@ -58,7 +51,7 @@ const ForgotPasswordPage = () => {
             setMessage(res.data.message);
             setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
-            setError(getErrorMessage(err));
+            setError(err.response?.data?.message || 'Có lỗi xảy ra');
         } finally {
             setLoading(false);
         }
