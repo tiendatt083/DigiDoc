@@ -12,6 +12,9 @@ spring:
           auth: true
           starttls:
             enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
   datasource:
     url: jdbc:mysql://localhost:3306/digital_document_shop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DATABASE_USERNAME:root}
