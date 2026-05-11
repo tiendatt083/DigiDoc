@@ -10,8 +10,11 @@ spring:
       mail:
         smtp:
           auth: true
+          connectiontimeout: 5000
           starttls:
             enable: true
+          timeout: 5000
+          writetimeout: 5000
   datasource:
     url: jdbc:mysql://localhost:3306/digital_document_shop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DATABASE_USERNAME:root}
@@ -39,6 +42,12 @@ app:
   frontend-url: http://localhost:5173
   # Prefix nội dung chuyển khoản - người dùng phải ghi "DIGIDOC <orderCode>"
   transfer-prefix: DIGIDOC
+  email:
+    provider: ${EMAIL_PROVIDER:smtp}
+    from: ${MAIL_FROM:${MAIL_USERNAME:}}
+
+resend:
+  api-key: ${RESEND_API_KEY:}
 
 google:
   client-id: ${GOOGLE_CLIENT_ID:}
