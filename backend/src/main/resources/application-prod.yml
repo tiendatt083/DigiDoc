@@ -55,5 +55,10 @@ cloudinary:
   api-key: ${CLOUDINARY_API_KEY}
   api-secret: ${CLOUDINARY_API_SECRET}
 
+brevo:
+  api-key: ${BREVO_API_KEY:}
+  from-email: ${BREVO_FROM_EMAIL:${MAIL_USERNAME}}
+  from-name: ${BREVO_FROM_NAME:StudyDoc}
+
 server:
   port: ${PORT:8080}
