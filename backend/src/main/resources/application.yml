@@ -4,8 +4,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: nguyendat20041973@gmail.com
-    password: dzgelhwdxyizznbg
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -14,8 +14,8 @@ spring:
             enable: true
   datasource:
     url: jdbc:mysql://localhost:3306/digital_document_shop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
   jpa:
     hibernate:
       ddl-auto: update
@@ -30,7 +30,8 @@ spring:
       max-request-size: 50MB
 
 jwt:
-  secret: aGV5X3RoaXNfaXNfYV92ZXJ5X3NlY3JldF9rZXlfZm9yX2p3dF9hdXRoZW50aWNhdGlvbl9wbGVhc2VfY2hhbmdlX2l0X2luX3Byb2R1Y3Rpb24=
+  # Dev fallback only. Production must set JWT_SECRET in environment variables.
+  secret: ${JWT_SECRET:ZGV2X29ubHlfand0X3NlY3JldF9mb3JfZGlnaXRhbF9kb2N1bWVudF9zaG9wX2NoYW5nZV9pbl9wcm9k}
   expirationMs: 86400000 # 24 hours
 
 app:
@@ -40,16 +41,16 @@ app:
   transfer-prefix: DIGIDOC
 
 google:
-  client-id: 1086823449607-8238vrl3is10ab3jd3mf0sep18qtcsq0.apps.googleusercontent.com
+  client-id: ${GOOGLE_CLIENT_ID:}
 
 # =============================================
 # Cấu hình SePay (điền vào sau khi đăng ký)
 # =============================================
 sepay:
   # API Key lấy từ sepay.vn → Cài đặt → API Key
-  api-key: F49VFE1UECHFYB1RDHOS97UTWP4R3SJZMNEIW6B2LKID8HHG75RGVWASXQBAQKD2
+  api-key: ${SEPAY_API_KEY:}
   # Webhook token = API Key (SePay dùng cùng 1 key)
-  webhook-token: F49VFE1UECHFYB1RDHOS97UTWP4R3SJZMNEIW6B2LKID8HHG75RGVWASXQBAQKD2
+  webhook-token: ${SEPAY_WEBHOOK_TOKEN:}
 
 # =============================================
 # Thông tin tài khoản ngân hàng của bạn
@@ -57,18 +58,18 @@ sepay:
 bank:
   # TPBank (Tien Phong Bank)
   id: "970423"
-  account-number: 07480066036
-  account-name: NGUYEN TIEN DAT
-  display-name: TPBank (Tien Phong Bank)
+  account-number: ${BANK_ACCOUNT_NUMBER:}
+  account-name: ${BANK_ACCOUNT_NAME:}
+  display-name: ${BANK_DISPLAY_NAME:TPBank (Tien Phong Bank)}
 
 # =============================================
 # Cloudinary — lưu ảnh thumbnail trên cloud
 # Đăng ký tại cloudinary.com (miễn phí 25GB)
 # =============================================
 cloudinary:
-  cloud-name: digidoc
-  api-key: 483941893776224
-  api-secret: MszKNq1XmyHzG09wmNyPzq5nbqE
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
 
 server:
   port: 8080

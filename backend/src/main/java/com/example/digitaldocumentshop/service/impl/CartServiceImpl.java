@@ -40,6 +40,10 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void addToCart(String email, CartRequest request) {
+        if (request.getQuantity() == null || request.getQuantity() <= 0) {
+            throw new RuntimeException("Quantity must be greater than 0");
+        }
+
         User user = getUser(email);
         Document document = documentRepository.findById(request.getDocumentId())
                 .orElseThrow(() -> new RuntimeException("Document not found"));
@@ -63,6 +67,10 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void updateQuantity(String email, Long cartItemId, Integer quantity) {
+        if (quantity == null || quantity <= 0) {
+            throw new RuntimeException("Quantity must be greater than 0");
+        }
+
         User user = getUser(email);
         CartItem item = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));

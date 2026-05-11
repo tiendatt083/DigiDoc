@@ -34,7 +34,11 @@ export const showToast = (message, type = 'info', duration = DEFAULT_DURATION) =
     box-shadow: 0 4px 20px rgba(0,0,0,0.3); min-width: 250px;
     animation: slideIn 0.3s ease; font-family: 'Be Vietnam Pro', sans-serif;
   `;
-  toastEl.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+  const iconEl = document.createElement('span');
+  iconEl.textContent = icon;
+  const messageEl = document.createElement('span');
+  messageEl.textContent = message;
+  toastEl.append(iconEl, messageEl);
 
   // Add slide-in keyframe once
   if (!document.getElementById('toast-styles')) {
@@ -62,4 +66,3 @@ export const toast = {
   info:    (msg, dur) => showToast(msg, 'info', dur),
   warning: (msg, dur) => showToast(msg, 'warning', dur),
 };
-

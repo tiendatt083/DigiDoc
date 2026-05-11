@@ -32,8 +32,8 @@ public class OrderController {
     }
 
     @GetMapping("/{orderCode}")
-    public ResponseEntity<Order> getOrder(@PathVariable String orderCode) {
-        return ResponseEntity.ok(orderService.getOrderByCode(orderCode));
+    public ResponseEntity<Order> getOrder(@PathVariable String orderCode, Authentication authentication) {
+        return ResponseEntity.ok(orderService.getOrderByCodeForUser(orderCode, authentication.getName()));
     }
 
     @PostMapping("/cancel/{orderCode}")

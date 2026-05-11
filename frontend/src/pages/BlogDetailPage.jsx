@@ -6,6 +6,21 @@ import { ArrowLeft, Calendar, Tag } from 'lucide-react';
 const formatDate = (str) =>
   str ? new Date(str).toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
 
+const sanitizeHtml = (html = '') => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script, iframe, object, embed, link, meta').forEach(el => el.remove());
+  doc.body.querySelectorAll('*').forEach(el => {
+    [...el.attributes].forEach(attr => {
+      const name = attr.name.toLowerCase();
+      const value = attr.value.trim().toLowerCase();
+      if (name.startsWith('on') || value.startsWith('javascript:')) {
+        el.removeAttribute(attr.name);
+      }
+    });
+  });
+  return doc.body.innerHTML;
+};
+
 export default function BlogDetailPage() {
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
@@ -100,7 +115,7 @@ export default function BlogDetailPage() {
       {/* Content */}
       <div
         className="blog-content"
-        dangerouslySetInnerHTML={{ __html: blog.content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
         style={{
           color: '#94a3b8', lineHeight: 1.9, fontSize: 16
         }}

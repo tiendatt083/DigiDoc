@@ -142,6 +142,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void resetPassword(String email, String otp, String newPassword) {
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new RuntimeException("Mật khẩu phải có từ 6 ký tự trở lên.");
+        }
+
         String lowercaseEmail = email != null ? email.toLowerCase() : null;
         OtpToken otpToken = otpTokenRepository.findByEmailAndOtpCode(lowercaseEmail, otp)
                 .orElseThrow(() -> new RuntimeException("Error: Invalid OTP."));

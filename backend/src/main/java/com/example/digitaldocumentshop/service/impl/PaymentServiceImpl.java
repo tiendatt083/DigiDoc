@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,12 +42,22 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public Payment createPayment(String orderCode, String paymentMethod) {
+    public Payment createPayment(String orderCode, String paymentMethod, String email) {
         Order order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
         if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
             throw new RuntimeException("Order is not pending payment");
+        }
+
+        java.util.Optional<Payment> existing = paymentRepository.findByOrderId(order.getId());
+        if (existing.isPresent()) {
+            return existing.get();
         }
 
         Payment payment = Payment.builder()
@@ -61,17 +72,25 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public Payment processWebhook(String orderCode, boolean isSuccess) {
+    public Payment processWebhook(String orderCode, boolean isSuccess, BigDecimal transferAmount, String referenceCode) {
         Order order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         Payment payment = paymentRepository.findByOrderId(order.getId())
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
+        if (payment.getStatus() == PaymentStatus.PAID || order.getStatus() == OrderStatus.PAID) {
+            return payment;
+        }
+
+        if (transferAmount != null && transferAmount.compareTo(order.getFinalAmount()) < 0) {
+            throw new RuntimeException("Transfer amount is less than order amount");
+        }
+
         if (isSuccess) {
             payment.setStatus(PaymentStatus.PAID);
             payment.setPaidAt(LocalDateTime.now());
-            payment.setTransactionId("TXN" + System.currentTimeMillis());
+            payment.setTransactionId(referenceCode != null && !referenceCode.isBlank() ? referenceCode : "TXN" + System.currentTimeMillis());
             
             order.setStatus(OrderStatus.PAID);
             
@@ -127,9 +146,14 @@ public class PaymentServiceImpl implements PaymentService {
     private String transferPrefix;
 
     @Override
-    public Map<String, Object> getPaymentQRInfo(String orderCode) {
+    public Map<String, Object> getPaymentQRInfo(String orderCode, String email) {
         Order order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
 
         // Nội dung chuyển khoản = PREFIX + orderCode (VD: "DIGIDOC ORD20240101")
         String transferContent = transferPrefix + " " + orderCode;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -86,8 +87,11 @@ public class SepayWebhookController {
 
             System.out.println("🔍 Xử lý thanh toán cho đơn hàng: " + orderCode);
 
+            BigDecimal transferAmount = parseAmount(payload.get("transferAmount"));
+            String referenceCode = payload.get("referenceCode") != null ? payload.get("referenceCode").toString() : null;
+
             // 5. Xử lý thanh toán
-            paymentService.processWebhook(orderCode, true);
+            paymentService.processWebhook(orderCode, true, transferAmount, referenceCode);
 
             System.out.println("✅ Thanh toán thành công: " + orderCode);
             return ResponseEntity.ok(Map.of(
@@ -117,5 +121,14 @@ public class SepayWebhookController {
 
         // Lấy từ đầu tiên (orderCode không có dấu cách)
         return afterPrefix.split("\\s+")[0];
+    }
+
+    private BigDecimal parseAmount(Object amount) {
+        if (amount == null) return null;
+        try {
+            return new BigDecimal(amount.toString());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 }

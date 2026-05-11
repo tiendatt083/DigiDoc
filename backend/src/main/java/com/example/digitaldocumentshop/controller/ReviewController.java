@@ -72,6 +72,9 @@ public class ReviewController {
         }
 
         int rating = Integer.parseInt(payload.get("rating").toString());
+        if (rating < 1 || rating > 5) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Rating must be between 1 and 5."));
+        }
         String comment = (String) payload.get("comment");
 
         Review review = Review.builder()

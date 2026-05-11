@@ -139,6 +139,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Order getOrderByCodeForUser(String orderCode, String email) {
+        Order order = getOrderByCode(orderCode);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        if (!order.getUser().getId().equals(user.getId()) && user.getRole() != com.example.digitaldocumentshop.enums.Role.ROLE_ADMIN) {
+            throw new RuntimeException("Unauthorized");
+        }
+        return order;
+    }
+
+    @Override
     public List<Order> getMyOrders(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         return orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
