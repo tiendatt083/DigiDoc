@@ -64,7 +64,7 @@ bank:
 
 # =============================================
 # Cloudinary — lưu ảnh thumbnail trên cloud
-# Đăng ký tại cloudinary.com (miễn phí 25GB)
+# Đăng ký tại cloudinary.ccom (miễn phí 25GB)
 # =============================================
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME:}
@@ -74,4 +74,4 @@ cloudinary:
 server:
   port: 8080
   error:
-    include-message: always
+    include-message: always 
