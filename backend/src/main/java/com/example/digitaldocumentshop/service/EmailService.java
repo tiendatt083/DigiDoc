@@ -105,6 +105,7 @@ public class EmailService {
                     .timeout(Duration.ofSeconds(20))
                     .header("Authorization", "Bearer " + resendApiKey)
                     .header("Content-Type", "application/json")
+                    .header("User-Agent", "DigiDocBackend/1.0")
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
