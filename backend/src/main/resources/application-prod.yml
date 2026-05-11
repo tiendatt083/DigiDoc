@@ -12,9 +12,6 @@ spring:
           auth: true
           starttls:
             enable: true
-          connectiontimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -54,11 +51,6 @@ cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
   api-key: ${CLOUDINARY_API_KEY}
   api-secret: ${CLOUDINARY_API_SECRET}
-
-brevo:
-  api-key: ${BREVO_API_KEY:}
-  from-email: ${BREVO_FROM_EMAIL:${MAIL_USERNAME}}
-  from-name: ${BREVO_FROM_NAME:StudyDoc}
 
 server:
   port: ${PORT:8080}
