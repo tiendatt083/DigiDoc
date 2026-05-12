@@ -1161,3 +1161,18 @@
   padding: 14px 0 0;
   z-index: 2;
 }
+
+/* Fixed-position admin modals must not be trapped by page transforms. */
+.admin-main,
+.admin-content,
+.admin-page {
+  animation: none !important;
+  transform: none !important;
+}
+
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw;
+  height: 100dvh;
+}

@@ -352,8 +352,7 @@ body::after {
   50% { box-shadow: 0 16px 34px rgba(20,184,166,0.28); }
 }
 
-main,
-.admin-page {
+main:not(.admin-main) {
   animation: digidocFadeUp 0.42s cubic-bezier(.2,.8,.2,1) both;
 }
 
