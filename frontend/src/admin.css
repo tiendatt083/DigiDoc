@@ -1133,3 +1133,31 @@
   background: #ffffff;
   color: #132033;
 }
+
+/* Keep admin modals reachable on short screens */
+.modal-overlay {
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: clamp(16px, 4vh, 44px) 20px;
+  overscroll-behavior: contain;
+}
+
+.modal-box {
+  margin: 0 auto;
+  max-height: none;
+  width: min(100%, 520px);
+}
+
+.modal-box.wide {
+  width: min(100%, 760px);
+  max-width: 760px;
+}
+
+.modal-footer {
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+  padding: 14px 0 0;
+  z-index: 2;
+}

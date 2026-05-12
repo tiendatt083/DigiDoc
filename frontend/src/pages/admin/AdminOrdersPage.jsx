@@ -4,9 +4,8 @@ import { adminGetAllOrders, adminUpdateOrderStatus } from '../../api/adminApi';
 const STATUS_MAP = {
   PENDING_PAYMENT: { label: 'Chờ thanh toán', color: '#f59e0b' },
   PAID: { label: 'Đã thanh toán', color: '#10b981' },
-  CANCELLED: { label: 'Đã huỷ', color: '#ef4444' },
-  PROCESSING: { label: 'Đang xử lý', color: '#6366f1' },
-  COMPLETED: { label: 'Hoàn thành', color: '#3b82f6' },
+  CANCELLED: { label: 'Đã hủy', color: '#ef4444' },
+  EXPIRED: { label: 'Hết hạn', color: '#64748b' },
 };
 
 const ORDER_STATUSES = Object.keys(STATUS_MAP);
@@ -33,7 +32,9 @@ export default function AdminOrdersPage() {
   };
 
   const formatCurrency = (val) =>
-    val ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val) : '—';
+    val !== null && val !== undefined
+      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val)
+      : '—';
 
   const formatDate = (str) => str ? new Date(str).toLocaleString('vi-VN') : '—';
 

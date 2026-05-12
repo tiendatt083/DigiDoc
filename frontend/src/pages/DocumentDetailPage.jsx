@@ -144,8 +144,9 @@ const DocumentDetailPage = () => {
                         </div>
                         
                         <div className="mt-6 flex items-center gap-6 text-sm text-slate-500">
-                            <div className="flex items-center gap-2"><FileText size={16} /> {doc.fileType || 'Document'}</div>
-                            <div className="flex items-center gap-2"><Download size={16} /> {(doc.fileSize / 1024 / 1024).toFixed(2)} MB</div>
+                            {doc.fileSize && (
+                                <div className="flex items-center gap-2"><Download size={16} /> {(doc.fileSize / 1024 / 1024).toFixed(2)} MB</div>
+                            )}
                         </div>
                     </div>
                 </div>
