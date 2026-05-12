@@ -8,22 +8,22 @@ import { toast } from '../utils/toast';
 const STATUS_MAP = {
   PENDING_PAYMENT: {
     label: 'Chờ thanh toán',
-    icon: <Clock size={12}/>,
+    icon: <Clock size={12} />,
     cls: { bg: '#fff7e8', color: '#b45309', border: '#fed7aa' },
   },
   PAID: {
     label: 'Đã thanh toán',
-    icon: <CheckCircle size={12}/>,
+    icon: <CheckCircle size={12} />,
     cls: { bg: '#e8fbf5', color: '#0f766e', border: '#b7eadc' },
   },
   CANCELLED: {
     label: 'Đã hủy',
-    icon: <XCircle size={12}/>,
+    icon: <XCircle size={12} />,
     cls: { bg: '#fff1f2', color: '#e11d48', border: '#fecdd3' },
   },
   EXPIRED: {
     label: 'Hết hạn',
-    icon: <XCircle size={12}/>,
+    icon: <XCircle size={12} />,
     cls: { bg: '#eef4fb', color: '#526274', border: '#dbe6f3' },
   },
 };
@@ -110,7 +110,7 @@ const MyOrdersPage = () => {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <div className="spinner" style={{ width: 36, height: 36 }}/>
+        <div className="spinner" style={{ width: 36, height: 36 }} />
       </div>
     );
   }
@@ -120,13 +120,13 @@ const MyOrdersPage = () => {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, marginBottom: 30, flexWrap: 'wrap' }}>
         <div>
           <span className="pill pill-indigo" style={{ marginBottom: 12 }}>
-            <Package size={12}/> Lịch sử mua
+            <Package size={12} /> Lịch sử mua
           </span>
           <h1 style={{ fontSize: 34, fontWeight: 900, color: '#132033', margin: '0 0 6px', letterSpacing: 0 }}>Đơn hàng của tôi</h1>
           <p style={{ color: '#526274', margin: 0 }}>Tổng: {orders.length} đơn hàng</p>
         </div>
         <button onClick={fetchOrders} className="btn-secondary" style={{ padding: '10px 16px' }}>
-          <RefreshCw size={15}/> Làm mới
+          <RefreshCw size={15} /> Làm mới
         </button>
       </header>
 
@@ -139,7 +139,7 @@ const MyOrdersPage = () => {
           border: '1px solid #dbe6f3',
           boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
         }}>
-          <Package size={56} color="#9ab0cb" style={{ margin: '0 auto 16px' }}/>
+          <Package size={56} color="#9ab0cb" style={{ margin: '0 auto 16px' }} />
           <h2 style={{ color: '#132033', fontSize: 20, fontWeight: 900, margin: '0 0 8px' }}>Bạn chưa có đơn hàng nào</h2>
           <p style={{ color: '#526274', fontSize: 15, marginBottom: 22 }}>Khám phá kho tài liệu và bắt đầu lưu tài liệu về tài khoản.</p>
           <Link to="/documents" className="btn-primary">
@@ -182,10 +182,10 @@ const MyOrdersPage = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <StatusBadge status={order.status}/>
+                  <StatusBadge status={order.status} />
                   {order.status === 'PENDING_PAYMENT' && (
                     <button onClick={() => handleContinuePayment(order.orderCode)} className="btn-primary" style={{ padding: '9px 14px', fontSize: 13 }}>
-                      <CreditCard size={14}/> Thanh toán ngay
+                      <CreditCard size={14} /> Thanh toán ngay
                     </button>
                   )}
                 </div>
@@ -218,7 +218,7 @@ const MyOrdersPage = () => {
                         {item.document?.thumbnailPath ? (
                           <img src={getUploadUrl(item.document.thumbnailPath) || ''} alt={item.document?.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <Package size={24}/>
+                          <Package size={24} />
                         )}
                       </div>
                       <div style={{ minWidth: 0 }}>
@@ -229,7 +229,7 @@ const MyOrdersPage = () => {
 
                     {order.status === 'PAID' && (
                       <button onClick={() => handleDownload(item.document.id, item.document.title)} disabled={downloading === item.document.id} className="btn-secondary" style={{ padding: '8px 14px', fontSize: 13, color: '#0f766e', borderColor: '#b7eadc' }}>
-                        <Download size={14}/>
+                        <Download size={14} />
                         {downloading === item.document.id ? 'Đang tải...' : 'Tải xuống'}
                       </button>
                     )}
