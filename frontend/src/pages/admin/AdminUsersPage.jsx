@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
+import { Pencil, Trash2, X, Check } from 'lucide-react';
 import { adminGetAllUsers, adminUpdateUser, adminDeleteUser } from '../../api/adminApi';
 
 export default function AdminUsersPage() {

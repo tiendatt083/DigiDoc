@@ -4,6 +4,7 @@ import { useCartStore } from '../context/cartStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trash2, ShoppingCart, ArrowRight, Tag, CheckCircle, XCircle } from 'lucide-react';
 import api from '../api/axios';
+import { toast } from '../utils/toast';
 
 const CartPage = () => {
     const { items, loading, removeFromCart, updateQuantity, clearCart, fetchCart } = useCartStore();
@@ -17,14 +18,14 @@ const CartPage = () => {
 
     useEffect(() => {
         fetchCart();
-    }, []);
+    }, [fetchCart]);
 
     // Khi items load xong, chọn tất cả mặc định
     useEffect(() => {
         if (items.length > 0) {
             setSelectedIds(new Set(items.map(i => i.id)));
         }
-    }, [items.length]);
+    }, [items]);
 
     const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
@@ -62,7 +63,7 @@ const CartPage = () => {
 
     const handleApplyVoucher = async () => {
         if (!voucherCode.trim()) return;
-        if (subtotal === 0) { setVoucherError('Vui lòng chọn ít nhất một sản phẩm.'); return; }
+        if (subtotal === 0) { setVoucherError('Vui lòng chọn ít nhất một tài liệu.'); return; }
         setVoucherLoading(true);
         setVoucherError('');
         setVoucherResult(null);
@@ -82,7 +83,7 @@ const CartPage = () => {
     };
 
     const handleCheckout = () => {
-        if (selectedIds.size === 0) { alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán.'); return; }
+        if (selectedIds.size === 0) { toast.warning('Vui lòng chọn ít nhất một tài liệu để thanh toán.'); return; }
         // Lưu selectedItemIds và voucher vào sessionStorage để CheckoutPage đọc
         sessionStorage.setItem('selectedCartItemIds', JSON.stringify([...selectedIds]));
         sessionStorage.setItem('appliedVoucher', voucherResult ? JSON.stringify(voucherResult) : '');
@@ -99,7 +100,7 @@ const CartPage = () => {
                         <ShoppingCart className="h-10 w-10 text-slate-400" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2">Giỏ hàng trống</h2>
-                    <p className="text-slate-500 mb-8">Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+                    <p className="text-slate-500 mb-8">Bạn chưa thêm tài liệu nào vào giỏ hàng.</p>
                     <Link to="/documents" className="inline-flex items-center gap-2 bg-indigo-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
                         Tiếp Tục Mua Sắm <ArrowRight size={18} />
                     </Link>
@@ -127,7 +128,7 @@ const CartPage = () => {
                             className="w-4 h-4 accent-indigo-600 cursor-pointer"
                         />
                         <label htmlFor="select-all" className="text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            Chọn tất cả ({items.length} sản phẩm)
+                            Chọn tất cả ({items.length} tài liệu)
                         </label>
                         {selectedIds.size > 0 && selectedIds.size < items.length && (
                             <span className="ml-auto text-xs text-slate-500">Đã chọn {selectedIds.size}/{items.length}</span>
@@ -228,7 +229,7 @@ const CartPage = () => {
                         {/* Price summary */}
                         <div className="space-y-3 text-sm">
                             <div className="flex justify-between text-slate-600">
-                                <span>Đã chọn ({selectedIds.size} sản phẩm)</span>
+                                <span>Đã chọn ({selectedIds.size} tài liệu)</span>
                                 <span>{formatPrice(subtotal)}</span>
                             </div>
                             {voucherResult && (

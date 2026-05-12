@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { getPaymentQR } from '../api/adminApi';
 import { AlertCircle, CheckCircle, Clock, CreditCard, RefreshCw, XCircle } from 'lucide-react';
+import { toast } from '../utils/toast';
 
 const formatVND = (val) =>
   val ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val) : '—';
@@ -65,10 +66,10 @@ const PaymentPage = () => {
     if (!window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) return;
     try {
       await api.post(`/orders/cancel/${orderCode}`);
-      alert('Đã hủy đơn hàng.');
+      toast.success('Đã hủy đơn hàng.');
       navigate('/cart');
     } catch (err) {
-      alert(err.response?.data?.message || 'Không thể hủy đơn hàng.');
+      toast.error(err.response?.data?.message || 'Không thể hủy đơn hàng.');
     }
   };
 

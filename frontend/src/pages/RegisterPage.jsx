@@ -19,7 +19,7 @@ const RegisterPage = () => {
             const res = await api.post('/auth/google', { idToken: credentialResponse.credential });
             login({ id: res.data.id, email: res.data.email, fullName: res.data.fullName, roles: res.data.roles }, res.data.token);
             navigate('/');
-        } catch (err) {
+        } catch {
             setError('Đăng nhập Google thất bại');
         }
     };

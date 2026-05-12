@@ -3,6 +3,7 @@ import { getUploadUrl } from '../config/env';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { CheckCircle, Clock, CreditCard, Download, Package, RefreshCw, XCircle } from 'lucide-react';
+import { toast } from '../utils/toast';
 
 const STATUS_MAP = {
   PENDING_PAYMENT: {
@@ -90,7 +91,7 @@ const MyOrdersPage = () => {
       link.click();
       link.remove();
     } catch {
-      alert('Tải xuống thất bại. Vui lòng thử lại.');
+      toast.error('Không thể tải tài liệu. Vui lòng thử lại.');
     } finally {
       setDownloading(null);
     }

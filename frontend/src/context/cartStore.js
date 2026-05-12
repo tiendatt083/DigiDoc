@@ -23,10 +23,10 @@ export const useCartStore = create((set, get) => ({
     try {
       await api.post('/cart/add', { documentId, quantity });
       await get().fetchCart();
-      toast.success('Đã thêm vào giỏ hàng! 🛒');
+      toast.success('Đã thêm tài liệu vào giỏ hàng.');
       return { success: true };
     } catch (error) {
-      const msg = error.response?.data?.message || error.response?.data?.error || 'Không thể thêm vào giỏ hàng';
+      const msg = error.response?.data?.message || error.response?.data?.error || 'Không thể thêm tài liệu vào giỏ hàng.';
       toast.error(msg);
       return { success: false, error: msg };
     }
@@ -36,9 +36,9 @@ export const useCartStore = create((set, get) => ({
     try {
       await api.delete(`/cart/remove/${id}`);
       await get().fetchCart();
-      toast.success('Đã xoá khỏi giỏ hàng');
-    } catch (error) {
-      toast.error('Không thể xoá sản phẩm');
+      toast.success('Đã xóa tài liệu khỏi giỏ hàng.');
+    } catch {
+      toast.error('Không thể xóa tài liệu khỏi giỏ hàng.');
     }
   },
 
@@ -46,8 +46,8 @@ export const useCartStore = create((set, get) => ({
     try {
       await api.put(`/cart/update/${id}?quantity=${quantity}`);
       await get().fetchCart();
-    } catch (error) {
-      toast.error('Không thể cập nhật số lượng');
+    } catch {
+      toast.error('Không thể cập nhật số lượng tài liệu.');
     }
   },
 
@@ -55,8 +55,8 @@ export const useCartStore = create((set, get) => ({
     try {
       await api.delete('/cart/clear');
       set({ items: [] });
-    } catch (error) {
-      toast.error('Không thể xoá giỏ hàng');
+    } catch {
+      toast.error('Không thể xóa giỏ hàng.');
     }
   },
 }));

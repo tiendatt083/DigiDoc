@@ -54,7 +54,7 @@ export default function AdminCategoriesPage() {
       }
       setShowModal(false);
       fetchCategories();
-    } catch (err) {
+    } catch {
       showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
     } finally {
       setSaving(false);

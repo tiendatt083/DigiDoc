@@ -112,11 +112,26 @@ body::after {
   transition: all 0.25s;
   box-shadow: 0 10px 24px rgba(37,99,235,0.24);
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.32) 45%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.55s ease;
+  z-index: -1;
 }
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 32px rgba(20,184,166,0.28);
   background: linear-gradient(135deg, #1d4ed8, #0f766e);
+}
+.btn-primary:hover::after {
+  transform: translateX(120%);
 }
 .btn-secondary {
   display: inline-flex;
@@ -132,11 +147,19 @@ body::after {
   cursor: pointer;
   transition: all 0.25s;
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
 }
 .btn-secondary:hover {
   background: rgba(37,99,235,0.08);
   border-color: #2563eb;
   color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(37,99,235,0.10);
+}
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* ──────────────────────────────────────
@@ -153,6 +176,16 @@ body::after {
   display: flex;
   flex-direction: column;
   box-shadow: 0 14px 34px rgba(27, 55, 100, 0.08);
+  position: relative;
+  isolation: isolate;
+}
+.product-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .product-card:hover {
   transform: translateY(-8px);
@@ -168,6 +201,11 @@ body::after {
 }
 .product-card:hover .card-thumb img {
   transform: scale(1.08);
+}
+
+.product-card:hover h3,
+.glass-card:hover h3 {
+  color: #1d4ed8 !important;
 }
 
 /* ──────────────────────────────────────
@@ -294,6 +332,103 @@ body::after {
 .blog-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
 .blog-content th { background: #e8f1ff; color: #1d4ed8; padding: 10px 16px; text-align: left; }
 .blog-content td { padding: 10px 16px; border-bottom: 1px solid #e2e8f0; }
+
+/* ──────────────────────────────────────
+   Motion & Interaction Polish
+────────────────────────────────────── */
+@keyframes digidocFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes digidocSoftPulse {
+  0%, 100% { box-shadow: 0 10px 24px rgba(37,99,235,0.24); }
+  50% { box-shadow: 0 16px 34px rgba(20,184,166,0.28); }
+}
+
+main,
+.admin-page {
+  animation: digidocFadeUp 0.42s cubic-bezier(.2,.8,.2,1) both;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 0.22s;
+  transition-timing-function: ease;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(37,99,235,0.22);
+  outline-offset: 3px;
+}
+
+.glass-card,
+.product-card,
+.admin-stat-card,
+.admin-chart-card,
+.admin-table-wrapper {
+  will-change: transform, box-shadow;
+}
+
+.glass-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37,99,235,0.08), transparent 42%, rgba(20,184,166,0.08));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.btn-primary[data-emphasis="pulse"] {
+  animation: digidocSoftPulse 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 
 /* ──────────────────────────────────────
    Admin UI (keep existing admin styles)

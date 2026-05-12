@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { Trash2, MessageSquare, Eye, EyeOff, Star } from 'lucide-react';
+import { toast } from '../../utils/toast';
 
 const AdminReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
@@ -28,9 +29,9 @@ const AdminReviewsPage = () => {
     try {
       await api.delete(`/admin/reviews/${id}`);
       setReviews(reviews.filter(r => r.id !== id));
-      alert('Đã xóa đánh giá');
-    } catch (err) {
-      alert('Lỗi khi xóa đánh giá');
+      toast.success('Đã xóa đánh giá.');
+    } catch {
+      toast.error('Không thể xóa đánh giá. Vui lòng thử lại.');
     }
   };
 
@@ -38,8 +39,9 @@ const AdminReviewsPage = () => {
     try {
       const res = await api.put(`/admin/reviews/${id}/toggle-hide`);
       setReviews(reviews.map(r => r.id === id ? { ...r, isHidden: res.data.isHidden } : r));
-    } catch (err) {
-      alert('Lỗi thao tác');
+      toast.success(res.data.isHidden ? 'Đã ẩn đánh giá.' : 'Đã hiển thị đánh giá.');
+    } catch {
+      toast.error('Không thể cập nhật trạng thái đánh giá.');
     }
   };
 
@@ -49,9 +51,9 @@ const AdminReviewsPage = () => {
       await api.put(`/admin/reviews/${id}/reply`, { adminReply: replyText[id] });
       setReviews(reviews.map(r => r.id === id ? { ...r, adminReply: replyText[id] } : r));
       setReplyingTo(null);
-      alert('Đã trả lời đánh giá');
-    } catch (err) {
-      alert('Lỗi khi trả lời');
+      toast.success('Đã gửi phản hồi đánh giá.');
+    } catch {
+      toast.error('Không thể gửi phản hồi đánh giá.');
     }
   };
 

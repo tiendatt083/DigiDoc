@@ -35,7 +35,7 @@ const LoginPage = () => {
             } else {
                 navigate('/', { replace: true });
             }
-        } catch (err) {
+        } catch {
             setError('Đăng nhập Google thất bại');
         }
     };

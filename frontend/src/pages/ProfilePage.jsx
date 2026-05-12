@@ -45,16 +45,7 @@ export default function ProfilePage() {
   const [showPwd, setShowPwd] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    fetchProfile();
-    fetchOrderCount();
-  }, [user, navigate]);
-
-  const fetchProfile = async () => {
+  async function fetchProfile() {
     try {
       const res = await api.get('/user/profile');
       setProfile(res.data);
@@ -64,16 +55,25 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const fetchOrderCount = async () => {
+  async function fetchOrderCount() {
     try {
       const res = await api.get('/orders/my-orders');
       setOrderCount(res.data?.length || 0);
     } catch {
       // Không ảnh hưởng tới trang hồ sơ.
     }
-  };
+  }
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    fetchProfile();
+    fetchOrderCount();
+  }, [user, navigate]);
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();

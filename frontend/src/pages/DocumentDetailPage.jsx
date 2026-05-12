@@ -32,7 +32,9 @@ const DocumentDetailPage = () => {
                     try {
                         const relRes = await api.get(`/documents/${res.data.id}/related`);
                         setRelatedDocs(relRes.data || []);
-                    } catch(e){}
+                    } catch {
+                        // Related documents are optional.
+                    }
                 }
             } catch (err) {
                 console.error("Failed to fetch document detail", err);

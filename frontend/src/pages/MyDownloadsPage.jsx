@@ -3,6 +3,7 @@ import { getUploadUrl } from '../config/env';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Download, Eye, FileText, Package, Star } from 'lucide-react';
 import api from '../api/axios';
+import { toast } from '../utils/toast';
 
 const formatVND = (val) =>
   val ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val) : '—';
@@ -69,7 +70,7 @@ export default function MyDownloadsPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch {
-      alert('Không thể tải file. Vui lòng thử lại!');
+      toast.error('Không thể tải tài liệu. Vui lòng thử lại.');
     } finally {
       setDownloading(null);
     }
@@ -81,7 +82,7 @@ export default function MyDownloadsPage() {
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       window.open(url, '_blank');
     } catch {
-      alert('Không thể xem trước sản phẩm này hoặc sản phẩm không có file xem trước.');
+      toast.error('Không thể xem trước tài liệu này.');
     }
   };
 
@@ -99,14 +100,14 @@ export default function MyDownloadsPage() {
     setIsSubmitting(true);
     try {
       await api.post(`/reviews/${reviewingDoc.id}`, { rating, comment, orderId: reviewingOrderId });
-      alert('Đánh giá thành công! Cảm ơn bạn.');
+      toast.success('Đã gửi đánh giá. Cảm ơn bạn đã phản hồi.');
       setReviewedKeys(prev => new Set([...prev, `${reviewingDoc.id}_${reviewingOrderId}`]));
       setReviewingDoc(null);
       setReviewingOrderId(null);
       setRating(5);
       setComment('');
     } catch (err) {
-      alert(err.response?.data?.error || 'Đã xảy ra lỗi, vui lòng thử lại.');
+      toast.error(err.response?.data?.error || 'Không thể gửi đánh giá. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
@@ -141,7 +142,7 @@ export default function MyDownloadsPage() {
           boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
         }}>
           <Package size={58} color="#9ab0cb" style={{ marginBottom: 16 }}/>
-          <h2 style={{ color: '#132033', fontSize: 20, fontWeight: 900, margin: '0 0 8px' }}>Chưa có sản phẩm nào</h2>
+          <h2 style={{ color: '#132033', fontSize: 20, fontWeight: 900, margin: '0 0 8px' }}>Chưa có tài liệu nào</h2>
           <p style={{ color: '#526274', marginBottom: 24 }}>Hãy khám phá kho tài liệu và bắt đầu mua sắm.</p>
           <button onClick={() => navigate('/documents')} className="btn-primary">
             Khám phá tài liệu
@@ -240,7 +241,7 @@ export default function MyDownloadsPage() {
             maxWidth: 480,
             boxShadow: '0 25px 60px rgba(27,55,100,0.18)',
           }}>
-            <h3 style={{ fontSize: 21, fontWeight: 900, color: '#132033', margin: '0 0 8px' }}>Đánh giá sản phẩm</h3>
+            <h3 style={{ fontSize: 21, fontWeight: 900, color: '#132033', margin: '0 0 8px' }}>Đánh giá tài liệu</h3>
             <p style={{ color: '#526274', fontSize: 14, marginBottom: 22 }}>{reviewingDoc.title}</p>
             
             <div style={{ display: 'flex', gap: 8, marginBottom: 22, justifyContent: 'center' }}>
@@ -261,7 +262,7 @@ export default function MyDownloadsPage() {
             <textarea 
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
+              placeholder="Chia sẻ trải nghiệm của bạn về tài liệu này..."
               style={{
                 width: '100%',
                 padding: 15,

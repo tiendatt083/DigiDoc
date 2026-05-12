@@ -20,7 +20,7 @@ export const useAuthStore = create((set) => ({
             try {
                 const user = JSON.parse(userStr);
                 set({ user, token });
-            } catch (e) {
+            } catch {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 set({ user: null, token: null });
