@@ -25,7 +25,7 @@ public class StartupLogger {
 
         System.out.println();
         System.out.println(GREEN + "╔══════════════════════════════════════════════════╗" + RESET);
-        System.out.println(GREEN + "║" + BOLD + CYAN + "       🚀 DigiDoc Backend đã khởi động!          " + RESET + GREEN + "║" + RESET);
+        System.out.println(GREEN + "║" + BOLD + CYAN + "       🚀 DiGiDoc Backend đã khởi động!          " + RESET + GREEN + "║" + RESET);
         System.out.println(GREEN + "╠══════════════════════════════════════════════════╣" + RESET);
         System.out.println(GREEN + "║" + RESET + "  ➜  " + YELLOW + "Local:   " + RESET + BOLD + "http://localhost:" + port + RESET + "                 " + GREEN + "║" + RESET);
         System.out.println(GREEN + "║" + RESET + "  ➜  " + YELLOW + "API:     " + RESET + BOLD + "http://localhost:" + port + "/api" + RESET + "             " + GREEN + "║" + RESET);

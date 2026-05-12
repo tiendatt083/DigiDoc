@@ -72,8 +72,8 @@ public class EmailService {
     }
 
     public void sendOtpEmail(String toEmail, String otp) {
-        String subject = "Mã OTP Đặt Lại Mật Khẩu - DigiDoc";
-        String text = "Xin chào,\n\nMã OTP để đặt lại mật khẩu của bạn là: " + otp + "\n\nMã này sẽ hết hạn trong 15 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai.\n\nTrân trọng,\nDigiDoc Team";
+        String subject = "Mã OTP Đặt Lại Mật Khẩu - DiGiDoc";
+        String text = "Xin chào,\n\nMã OTP để đặt lại mật khẩu của bạn là: " + otp + "\n\nMã này sẽ hết hạn trong 15 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai.\n\nTrân trọng,\nDiGiDoc Team";
 
         if ("resend".equalsIgnoreCase(emailProvider)) {
             sendWithResend(toEmail, subject, text);
@@ -129,7 +129,7 @@ public class EmailService {
                     .timeout(Duration.ofSeconds(20))
                     .header("Authorization", "Bearer " + resendApiKey)
                     .header("Content-Type", "application/json")
-                    .header("User-Agent", "DigiDocBackend/1.0")
+                    .header("User-Agent", "DiGiDocBackend/1.0")
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
@@ -172,7 +172,7 @@ public class EmailService {
                     .timeout(Duration.ofSeconds(20))
                     .header("Authorization", "Bearer " + accessToken)
                     .header("Content-Type", "application/json")
-                    .header("User-Agent", "DigiDocBackend/1.0")
+                    .header("User-Agent", "DiGiDocBackend/1.0")
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
@@ -207,7 +207,7 @@ public class EmailService {
                 .uri(URI.create("https://oauth2.googleapis.com/token"))
                 .timeout(Duration.ofSeconds(20))
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("User-Agent", "DigiDocBackend/1.0")
+                .header("User-Agent", "DiGiDocBackend/1.0")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 

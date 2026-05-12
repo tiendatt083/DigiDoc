@@ -182,7 +182,7 @@ const HomePage = () => {
             {/* ── FEATURES ── */}
             <section style={{ padding: '60px 24px', maxWidth: 1100, margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <h2 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9' }}>Tại Sao Chọn <span className="gradient-text">StudyDoc</span>?</h2>
+                    <h2 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9' }}>Tại Sao Chọn <span className="gradient-text">DiGiDoc</span>?</h2>
                     <p style={{ color: '#64748b', marginTop: 10, fontSize: 15 }}>Được hàng nghìn học sinh, sinh viên tin dùng mỗi ngày</p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>

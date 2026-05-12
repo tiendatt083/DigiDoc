@@ -11,29 +11,37 @@ export default function AdminBlogsPage() {
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchBlogs = () => {
     setLoading(true);
-    adminGetAllBlogs().then(res => setBlogs(res.data)).finally(() => setLoading(false));
+    adminGetAllBlogs()
+      .then(res => setBlogs(res.data))
+      .catch(err => setError(err.response?.data?.message || err.response?.data?.error || 'Không thể tải danh sách blog.'))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchBlogs(); }, []);
 
-  const openCreate = () => { setEditItem(null); setForm(EMPTY_FORM); setShowModal(true); };
+  const openCreate = () => { setEditItem(null); setForm(EMPTY_FORM); setError(''); setShowModal(true); };
   const openEdit = (item) => {
     setEditItem(item);
     setForm({ title: item.title, slug: item.slug, content: item.content, thumbnail: item.thumbnail || '', metaTitle: item.metaTitle || '', metaDescription: item.metaDescription || '', keywords: item.keywords || '', isPublished: item.isPublished ?? true });
+    setError('');
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setError('');
     try {
       if (editItem) await adminUpdateBlog(editItem.id, form);
       else await adminCreateBlog(form);
       setShowModal(false);
       fetchBlogs();
+    } catch (err) {
+      setError(err.response?.data?.message || err.response?.data?.error || 'Không thể lưu bài viết. Vui lòng kiểm tra lại nội dung.');
     } finally { setSaving(false); }
   };
 
@@ -103,6 +111,7 @@ export default function AdminBlogsPage() {
               <button className="modal-close" onClick={() => setShowModal(false)}><X size={18}/></button>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">
+              {error && <div className="form-error">{error}</div>}
               <div className="form-row">
                 <label>Tiêu đề *</label>
                 <input required value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="Tiêu đề bài viết..."/>

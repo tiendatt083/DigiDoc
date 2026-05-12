@@ -1,5 +1,5 @@
 /* =============================================
-   Admin Panel CSS - DigiDoc
+   Admin Panel CSS - DiGiDoc
    ============================================= */
 
 /* ─── Navbar Dropdown ─── */
@@ -146,6 +146,10 @@
   letter-spacing: 1px;
   padding: 8px 8px 4px;
   margin: 0;
+}
+
+.nav-section-label-spaced {
+  margin-top: 14px;
 }
 
 .nav-link {
@@ -701,6 +705,16 @@
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   margin-top: 4px;
+}
+
+.form-error {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  color: #fecaca;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* Form Row */

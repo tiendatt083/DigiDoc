@@ -109,7 +109,7 @@ public class GmailRefreshTokenTool {
                 .uri(URI.create("https://oauth2.googleapis.com/token"))
                 .timeout(Duration.ofSeconds(30))
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("User-Agent", "DigiDocTokenTool/1.0")
+                .header("User-Agent", "DiGiDocTokenTool/1.0")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 

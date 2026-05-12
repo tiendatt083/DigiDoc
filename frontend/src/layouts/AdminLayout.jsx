@@ -2,11 +2,17 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../context/authStore';
 import {
   LayoutDashboard, FileText, ShoppingBag, Users, LogOut,
-  Tag, BookOpen, Home, ChevronRight, Star
+  Tag, BookOpen, Home, ChevronRight, Star, Store
 } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { label: 'Tổng quan', path: '/admin', icon: LayoutDashboard, exact: true },
+const PREVIEW_ITEMS = [
+  { label: 'Trang chủ', path: '/', icon: Home, exact: true },
+  { label: 'Trang sản phẩm', path: '/documents', icon: Store },
+  { label: 'Blogs', path: '/blog', icon: BookOpen },
+  { label: 'Bảng điều khiển', path: '/admin', icon: LayoutDashboard, exact: true },
+];
+
+const MANAGEMENT_ITEMS = [
   { label: 'Tài liệu', path: '/admin/documents', icon: FileText },
   { label: 'Danh mục', path: '/admin/categories', icon: Tag },
   { label: 'Đơn hàng', path: '/admin/orders', icon: ShoppingBag },
@@ -32,7 +38,7 @@ const AdminLayout = () => {
         <div className="sidebar-brand">
           <div className="sidebar-logo">📚</div>
           <div>
-            <h1 className="sidebar-title">DigiDoc</h1>
+            <h1 className="sidebar-title">DiGiDoc</h1>
             <p className="sidebar-subtitle">Bảng điều khiển</p>
           </div>
         </div>
@@ -48,8 +54,22 @@ const AdminLayout = () => {
         </div>
 
         <nav className="sidebar-nav">
-          <p className="nav-section-label">MENU CHÍNH</p>
-          {NAV_ITEMS.map(({ label, path, icon: Icon, exact }) => (
+          <p className="nav-section-label">GIAO DIỆN WEBSITE</p>
+          {PREVIEW_ITEMS.map(({ label, path, icon: Icon, exact }) => (
+            <NavLink
+              key={path}
+              to={path}
+              end={exact}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={18}/>
+              <span>{label}</span>
+              <ChevronRight size={14} className="nav-arrow"/>
+            </NavLink>
+          ))}
+
+          <p className="nav-section-label nav-section-label-spaced">QUẢN TRỊ</p>
+          {MANAGEMENT_ITEMS.map(({ label, path, icon: Icon, exact }) => (
             <NavLink
               key={path}
               to={path}
@@ -64,9 +84,6 @@ const AdminLayout = () => {
         </nav>
 
         <div className="sidebar-footer">
-          <button onClick={() => navigate('/')} className="nav-link">
-            <Home size={18}/><span>Về trang chủ</span>
-          </button>
           <button onClick={handleLogout} className="nav-link logout">
             <LogOut size={18}/><span>Đăng xuất</span>
           </button>
@@ -84,4 +101,3 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
-

@@ -15,7 +15,7 @@ const Footer = () => (
                         <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <BookOpen size={16} color="#fff" />
                         </div>
-                        <span style={{ fontWeight: 800, fontSize: 17, background: 'linear-gradient(135deg,#a5b4fc,#06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontFamily: 'Space Grotesk, sans-serif' }}>StudyDoc</span>
+                        <span style={{ fontWeight: 800, fontSize: 17, background: 'linear-gradient(135deg,#a5b4fc,#06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontFamily: 'Space Grotesk, sans-serif' }}>DiGiDoc</span>
                     </Link>
                     <p style={{ color: '#475569', fontSize: 13, lineHeight: 1.7, maxWidth: 220 }}>
                         Nền tảng tài liệu học tập số uy tín — cung cấp hàng nghìn tài liệu chất lượng cao cho học sinh, sinh viên.
@@ -36,7 +36,7 @@ const Footer = () => (
                 <div>
                     <h4 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Khám Phá</h4>
                     <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {[['Trang Chủ', '/'], ['Tất Cả Tài Liệu', '/documents'], ['Blog Học Tập', '/blog']].map(([label, to]) => (
+                        {[['Trang Chủ', '/'], ['Trang Sản Phẩm', '/documents'], ['Blogs', '/blog']].map(([label, to]) => (
                             <li key={to}><Link to={to} style={{ color: '#475569', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
                                 onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
                                 onMouseLeave={e => e.currentTarget.style.color = '#475569'}
@@ -78,7 +78,7 @@ const Footer = () => (
 
             {/* Bottom bar */}
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-                <p style={{ color: '#334155', fontSize: 12 }}>© {new Date().getFullYear()} StudyDoc. Tất cả quyền được bảo lưu.</p>
+                <p style={{ color: '#334155', fontSize: 12 }}>© {new Date().getFullYear()} DiGiDoc. Tất cả quyền được bảo lưu.</p>
                 <div style={{ display: 'flex', gap: 6 }}>
                     {['Bảo Mật', 'Cookie', 'DMCA'].map(label => (
                         <span key={label} style={{ color: '#334155', fontSize: 11, padding: '3px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 6 }}>{label}</span>

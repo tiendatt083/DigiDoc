@@ -1,4 +1,4 @@
-# 📚 DigiDoc - Cửa Hàng Tài Liệu Số
+# 📚 DiGiDoc - Cửa Hàng Tài Liệu Số
 
 > Nền tảng mua bán và tải về tài liệu số trực tuyến với phân quyền ADMIN/USER, tích hợp thanh toán VietQR, hệ thống điểm thưởng, Flash Sale, Voucher và Blog SEO.
 
@@ -169,4 +169,4 @@ npm run dev
 
 ---
 
-> Made with ❤️ — DigiDoc Digital Document Shop
+> Made with ❤️ — DiGiDoc Digital Document Shop

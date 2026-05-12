@@ -28,7 +28,12 @@ const Navbar = () => {
     const cartCount = items.reduce((a, i) => a + i.quantity, 0);
 
     const navLinks = isAdmin
-        ? [{ label: 'Tài liệu', to: '/admin/documents' }, { label: 'Đơn hàng', to: '/admin/orders' }, { label: 'Người dùng', to: '/admin/users' }]
+        ? [
+            { label: 'Trang Chủ', to: '/' },
+            { label: 'Trang Sản Phẩm', to: '/documents' },
+            { label: 'Blogs', to: '/blog' },
+            { label: 'Bảng Điều Khiển', to: '/admin' },
+        ]
         : [{ label: 'Trang Chủ', to: '/' }, { label: 'Sản Phẩm', to: '/documents' }, { label: 'Blog', to: '/blog' }];
 
     return (
@@ -44,7 +49,7 @@ const Navbar = () => {
 
                 {/* Logo + nav */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-                    <Link to={isAdmin ? '/admin' : '/'} style={{
+                    <Link to="/" style={{
                         display: 'flex', alignItems: 'center', gap: 9,
                         textDecoration: 'none', fontWeight: 800, fontSize: 19,
                         fontFamily: 'Space Grotesk, sans-serif'
@@ -58,7 +63,7 @@ const Navbar = () => {
                             <BookOpen size={18} color="#fff" />
                         </div>
                         <span style={{ background: 'linear-gradient(135deg,#a5b4fc,#06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                            StudyDoc
+                            DiGiDoc
                         </span>
                         {isAdmin && (
                             <span style={{ fontSize: 9, background: 'rgba(99,102,241,0.2)', color: '#818cf8', padding: '2px 7px', borderRadius: 20, fontWeight: 700, border: '1px solid rgba(99,102,241,0.3)', WebkitTextFillColor: '#818cf8' }}>ADMIN</span>

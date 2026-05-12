@@ -13,8 +13,8 @@ import java.util.UUID;
 /**
  * CloudinaryService — upload ảnh & file PDF lên Cloudinary.
  * 
- * Ảnh (thumb) → lưu trong folder "studydoc/images"  → trả về HTTPS URL
- * File PDF     → lưu trong folder "studydoc/files"   → trả về HTTPS URL
+ * Ảnh (thumb) → lưu trong folder "digidoc/images"  → trả về HTTPS URL
+ * File PDF     → lưu trong folder "digidoc/files"   → trả về HTTPS URL
  * 
  * URL trả về là URL Cloudinary vĩnh viễn, không bị mất khi redeploy.
  */
@@ -40,7 +40,7 @@ public class CloudinaryService {
      */
     public String uploadImage(MultipartFile file) {
         try {
-            String publicId = "studydoc/images/" + UUID.randomUUID();
+            String publicId = "digidoc/images/" + UUID.randomUUID();
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                     "public_id", publicId,
                     "resource_type", "image",
@@ -58,7 +58,7 @@ public class CloudinaryService {
      */
     public String uploadDocument(MultipartFile file) {
         try {
-            String publicId = "studydoc/files/" + UUID.randomUUID();
+            String publicId = "digidoc/files/" + UUID.randomUUID();
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                     "public_id", publicId,
                     "resource_type", "raw",   // raw = mọi loại file
@@ -87,8 +87,8 @@ public class CloudinaryService {
     }
 
     private String extractPublicId(String url) {
-        // Ví dụ URL: https://res.cloudinary.com/cloud/image/upload/v123/studydoc/images/uuid.jpg
-        // publicId = studydoc/images/uuid (không có phần mở rộng)
+        // Ví dụ URL: https://res.cloudinary.com/cloud/image/upload/v123/digidoc/images/uuid.jpg
+        // publicId = digidoc/images/uuid (không có phần mở rộng)
         int uploadIdx = url.indexOf("/upload/");
         if (uploadIdx == -1) return url;
         String afterUpload = url.substring(uploadIdx + 8); // bỏ "/upload/"
