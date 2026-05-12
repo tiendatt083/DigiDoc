@@ -77,7 +77,7 @@ export default function AdminCategoriesPage() {
       {/* Header */}
       <div className="admin-page-header">
         <div>
-          <h1>🏷️ Quản lý danh mục</h1>
+          <h1>Quản lý danh mục</h1>
           <p>Thêm, sửa, xoá danh mục tài liệu</p>
         </div>
         <button className="btn-admin-primary" onClick={openCreate}>
@@ -111,22 +111,22 @@ export default function AdminCategoriesPage() {
                 </tr>
               ) : categories.map((cat, idx) => (
                 <tr key={cat.id}>
-                  <td style={{ color: '#64748b' }}>{idx + 1}</td>
+                  <td style={{ color: '#526274' }}>{idx + 1}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{
                         width: 36, height: 36, borderRadius: 10,
-                        background: 'rgba(99,102,241,0.15)',
+                        background: '#e8f1ff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#a5b4fc', flexShrink: 0
+                        color: '#2563eb', flexShrink: 0
                       }}>
                         <Tag size={16}/>
                       </div>
-                      <strong style={{ color: '#f1f5f9' }}>{cat.name}</strong>
+                      <strong style={{ color: '#132033' }}>{cat.name}</strong>
                     </div>
                   </td>
                   <td><code>{cat.slug}</code></td>
-                  <td style={{ color: '#64748b', maxWidth: 200 }}>
+                  <td style={{ color: '#526274', maxWidth: 200 }}>
                     {cat.description ? (
                       <span title={cat.description}>
                         {cat.description.length > 50
@@ -135,7 +135,7 @@ export default function AdminCategoriesPage() {
                       </span>
                     ) : <span style={{ opacity: 0.4 }}>—</span>}
                   </td>
-                  <td style={{ color: '#64748b', fontSize: 12 }}>
+                  <td style={{ color: '#526274', fontSize: 12 }}>
                     {cat.createdAt ? new Date(cat.createdAt).toLocaleDateString('vi-VN') : '—'}
                   </td>
                   <td>
@@ -160,7 +160,7 @@ export default function AdminCategoriesPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editing ? '✏️ Sửa danh mục' : '➕ Thêm danh mục mới'}</h2>
+              <h2>{editing ? 'Sửa danh mục' : 'Thêm danh mục mới'}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>
                 <X size={16}/>
               </button>
@@ -185,7 +185,7 @@ export default function AdminCategoriesPage() {
                   value={form.slug}
                   onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
                 />
-                <small style={{ color: '#64748b', fontSize: 11 }}>
+                <small style={{ color: '#526274', fontSize: 11 }}>
                   Tự động sinh từ tên. Có thể chỉnh thủ công.
                 </small>
               </div>

@@ -2,13 +2,11 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../context/authStore';
 import {
   LayoutDashboard, FileText, ShoppingBag, Users, LogOut,
-  Tag, BookOpen, Home, ChevronRight, Star, Store
+  Tag, BookOpen, Home, ChevronRight, Star
 } from 'lucide-react';
 
 const PREVIEW_ITEMS = [
   { label: 'Trang chủ', path: '/', icon: Home, exact: true },
-  { label: 'Trang sản phẩm', path: '/documents', icon: Store },
-  { label: 'Blogs', path: '/blog', icon: BookOpen },
   { label: 'Bảng điều khiển', path: '/admin', icon: LayoutDashboard, exact: true },
 ];
 
@@ -36,7 +34,7 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="sidebar-brand">
-          <div className="sidebar-logo">📚</div>
+          <div className="sidebar-logo"><BookOpen size={22}/></div>
           <div>
             <h1 className="sidebar-title">DiGiDoc</h1>
             <p className="sidebar-subtitle">Bảng điều khiển</p>

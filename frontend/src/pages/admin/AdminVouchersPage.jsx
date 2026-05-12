@@ -56,12 +56,32 @@ export default function AdminVouchersPage() {
   };
 
   const formatDate = (str) => str ? new Date(str).toLocaleDateString('vi-VN') : '—';
+  const getVoucherDisplayStatus = (voucher) => {
+    const now = new Date();
+    const endDate = voucher.endDate ? new Date(voucher.endDate) : null;
+    const usageLimit = voucher.usageLimit;
+    const usedCount = voucher.usedCount || 0;
+
+    if (voucher.status === 'INACTIVE') {
+      return { label: 'Đã tắt', className: 'inactive' };
+    }
+    if (endDate && endDate < now) {
+      return { label: 'Hết hạn', className: 'expired' };
+    }
+    if (usageLimit != null && usedCount >= usageLimit) {
+      return { label: 'Hết lượt', className: 'used-up' };
+    }
+    if (voucher.status === 'EXPIRED') {
+      return { label: 'Hết hạn', className: 'expired' };
+    }
+    return { label: 'Hoạt động', className: 'active' };
+  };
 
   return (
     <div className="admin-page">
       <div className="admin-page-header">
         <div>
-          <h1>🎫 Quản lý Voucher</h1>
+          <h1>Quản lý Voucher</h1>
           <p>Tạo và quản lý các mã giảm giá</p>
         </div>
         <button className="btn-admin-primary" onClick={openCreate}>
@@ -83,28 +103,31 @@ export default function AdminVouchersPage() {
             <tbody>
               {vouchers.length === 0 ? (
                 <tr><td colSpan="9" className="empty-row">Chưa có voucher nào</td></tr>
-              ) : vouchers.map((v, i) => (
-                <tr key={v.id}>
-                  <td>{i + 1}</td>
-                  <td>{v.name}</td>
-                  <td><code className="voucher-code">{v.code}</code></td>
-                  <td>{v.discountType === 'PERCENT' ? 'Phần trăm' : 'Số tiền cố định'}</td>
-                  <td>{v.discountType === 'PERCENT' ? `${v.discountValue}%` : `${v.discountValue?.toLocaleString('vi-VN')}₫`}</td>
-                  <td>{v.usedCount || 0}/{v.usageLimit || '∞'}</td>
-                  <td>{formatDate(v.endDate)}</td>
-                  <td>
-                    <span className={`status-badge ${v.status === 'ACTIVE' ? 'active' : 'inactive'}`}>
-                      {v.status === 'ACTIVE' ? 'Hoạt động' : 'Hết hạn'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-btns">
-                      <button className="btn-icon edit" onClick={() => openEdit(v)}><Pencil size={14}/></button>
-                      <button className="btn-icon delete" onClick={() => handleDelete(v.id, v.name)}><Trash2 size={14}/></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              ) : vouchers.map((v, i) => {
+                const displayStatus = getVoucherDisplayStatus(v);
+                return (
+                  <tr key={v.id}>
+                    <td>{i + 1}</td>
+                    <td>{v.name}</td>
+                    <td><code className="voucher-code">{v.code}</code></td>
+                    <td>{v.discountType === 'PERCENT' ? 'Phần trăm' : 'Số tiền cố định'}</td>
+                    <td>{v.discountType === 'PERCENT' ? `${v.discountValue}%` : `${v.discountValue?.toLocaleString('vi-VN')}₫`}</td>
+                    <td>{v.usedCount || 0}/{v.usageLimit || '∞'}</td>
+                    <td>{formatDate(v.endDate)}</td>
+                    <td>
+                      <span className={`status-badge ${displayStatus.className}`}>
+                        {displayStatus.label}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-btns">
+                        <button className="btn-icon edit" onClick={() => openEdit(v)}><Pencil size={14}/></button>
+                        <button className="btn-icon delete" onClick={() => handleDelete(v.id, v.name)}><Trash2 size={14}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -114,7 +137,7 @@ export default function AdminVouchersPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box wide" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editItem ? '✏️ Sửa voucher' : '➕ Thêm voucher mới'}</h2>
+              <h2>{editItem ? 'Sửa voucher' : 'Thêm voucher mới'}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}><X size={18}/></button>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">

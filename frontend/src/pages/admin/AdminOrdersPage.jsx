@@ -42,7 +42,7 @@ export default function AdminOrdersPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div>
-          <h1>📦 Quản lý đơn hàng</h1>
+          <h1>Quản lý đơn hàng</h1>
           <p>Tất cả đơn hàng trong hệ thống</p>
         </div>
       </div>

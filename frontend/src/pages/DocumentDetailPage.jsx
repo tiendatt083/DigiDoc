@@ -5,6 +5,7 @@ import api from '../api/axios';
 import { ShoppingCart, Star, FileText, Download, CheckCircle } from 'lucide-react';
 import { useCartStore } from '../context/cartStore';
 import { useAuthStore } from '../context/authStore';
+import { toast } from '../utils/toast';
 
 const DocumentDetailPage = () => {
     const { slug } = useParams();
@@ -48,6 +49,7 @@ const DocumentDetailPage = () => {
 
     const handleAddToCart = () => {
         if (!user) {
+            toast.warning('Vui lòng đăng nhập để thêm tài liệu vào giỏ hàng.');
             navigate('/login');
             return;
         }

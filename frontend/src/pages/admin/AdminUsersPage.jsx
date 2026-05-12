@@ -54,7 +54,7 @@ export default function AdminUsersPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div>
-          <h1>👥 Quản lý người dùng</h1>
+          <h1>Quản lý người dùng</h1>
           <p>Tất cả tài khoản người dùng trong hệ thống</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function AdminUsersPage() {
                   <td>{user.phoneNumber || '—'}</td>
                   <td>
                     <span className={`role-badge ${user.role === 'ROLE_ADMIN' ? 'admin' : 'user'}`}>
-                      {user.role === 'ROLE_ADMIN' ? '🛡️ Admin' : '👤 User'}
+                      {user.role === 'ROLE_ADMIN' ? 'Admin' : 'User'}
                     </span>
                   </td>
                   <td>
@@ -105,7 +105,7 @@ export default function AdminUsersPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>✏️ Sửa người dùng</h2>
+              <h2>Sửa người dùng</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}><X size={18}/></button>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">

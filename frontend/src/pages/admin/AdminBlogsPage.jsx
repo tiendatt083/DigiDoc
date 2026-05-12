@@ -57,7 +57,7 @@ export default function AdminBlogsPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div>
-          <h1>✍️ Quản lý Blog</h1>
+          <h1>Quản lý Blog</h1>
           <p>Viết và quản lý các bài viết SEO</p>
         </div>
         <button className="btn-admin-primary" onClick={openCreate}>
@@ -107,7 +107,7 @@ export default function AdminBlogsPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box wide" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editItem ? '✏️ Sửa bài viết' : '➕ Viết bài mới'}</h2>
+              <h2>{editItem ? 'Sửa bài viết' : 'Viết bài mới'}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}><X size={18}/></button>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">

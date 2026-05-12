@@ -1,92 +1,125 @@
-import { BookOpen, Globe, MessageCircle, PlayCircle } from 'lucide-react';
+import { BookOpen, Globe, Mail, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../context/authStore';
 
-const Footer = () => (
-    <footer style={{
-        background: 'rgba(8,8,24,0.95)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        marginTop: 'auto', position: 'relative', zIndex: 1
-    }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '56px 24px 32px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 40, marginBottom: 48 }}>
-                {/* Brand */}
-                <div>
-                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none', marginBottom: 14 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <BookOpen size={16} color="#fff" />
+const Footer = () => {
+    const { user } = useAuthStore();
+
+    return (
+        <footer style={{
+            background: '#ffffff',
+            borderTop: '1px solid #dbe6f3',
+            marginTop: 'auto',
+            position: 'relative',
+            zIndex: 1,
+        }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '52px 24px 28px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 36, marginBottom: 40 }}>
+                    <div>
+                        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 14 }}>
+                            <div style={{
+                                width: 36,
+                                height: 36,
+                                borderRadius: 14,
+                                background: 'linear-gradient(135deg,#2563eb,#14b8a6)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 12px 24px rgba(37,99,235,0.18)',
+                            }}>
+                                <BookOpen size={18} color="#fff" />
+                            </div>
+                            <span className="gradient-text" style={{ fontWeight: 900, fontSize: 19, fontFamily: 'Space Grotesk, sans-serif' }}>DiGiDoc</span>
+                        </Link>
+                        <p style={{ color: '#526274', fontSize: 14, lineHeight: 1.75, maxWidth: 280 }}>
+                            Kho tài liệu số dành cho học sinh, sinh viên và người đi làm muốn học nhanh, tra cứu dễ, mua tài liệu an toàn.
+                        </p>
+                        <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+                            {[Globe, MessageCircle, Mail].map((Icon, i) => (
+                                <a
+                                    key={i}
+                                    href="#"
+                                    style={{
+                                        width: 38,
+                                        height: 38,
+                                        borderRadius: 14,
+                                        background: '#f3f7fd',
+                                        border: '1px solid #dbe6f3',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: '#2563eb',
+                                        transition: 'all 0.2s',
+                                        textDecoration: 'none',
+                                    }}
+                                    onMouseEnter={e => {
+                                        e.currentTarget.style.background = '#e8f1ff';
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseLeave={e => {
+                                        e.currentTarget.style.background = '#f3f7fd';
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                    }}
+                                >
+                                    <Icon size={16} />
+                                </a>
+                            ))}
                         </div>
-                        <span style={{ fontWeight: 800, fontSize: 17, background: 'linear-gradient(135deg,#a5b4fc,#06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontFamily: 'Space Grotesk, sans-serif' }}>DiGiDoc</span>
-                    </Link>
-                    <p style={{ color: '#475569', fontSize: 13, lineHeight: 1.7, maxWidth: 220 }}>
-                        Nền tảng tài liệu học tập số uy tín — cung cấp hàng nghìn tài liệu chất lượng cao cho học sinh, sinh viên.
-                    </p>
-                    <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-                        {[Globe, MessageCircle, PlayCircle].map((Icon, i) => (
-                            <a key={i} href="#" style={{ width: 34, height: 34, borderRadius: 9, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', transition: 'all 0.2s', textDecoration: 'none' }}
-                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.15)'; e.currentTarget.style.color = '#a5b4fc'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#64748b'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
-                            >
-                                <Icon size={15} />
-                            </a>
-                        ))}
+                    </div>
+
+                    <div>
+                        <h4 style={{ color: '#132033', fontWeight: 900, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0 }}>Khám Phá</h4>
+                        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 11 }}>
+                            {[['Trang Chủ', '/'], ['Trang Sản Phẩm', '/documents'], ['Blogs', '/blog']].map(([label, to]) => (
+                                <li key={to}>
+                                    <Link
+                                        to={to}
+                                        style={{ color: '#526274', fontSize: 14, fontWeight: 650, textDecoration: 'none', transition: 'color 0.2s' }}
+                                        onMouseEnter={e => e.currentTarget.style.color = '#2563eb'}
+                                        onMouseLeave={e => e.currentTarget.style.color = '#526274'}
+                                    >
+                                        {label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 style={{ color: '#132033', fontWeight: 900, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0 }}>Hỗ Trợ</h4>
+                        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 11 }}>
+                            {['Câu Hỏi Thường Gặp', 'Liên Hệ', 'Điều Khoản Dịch Vụ'].map(label => (
+                                <li key={label}>
+                                    <span style={{ color: '#526274', fontSize: 14, fontWeight: 650 }}>{label}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 style={{ color: '#132033', fontWeight: 900, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0 }}>Cập Nhật Mới Nhất</h4>
+                        <p style={{ color: '#526274', fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
+                            Nhận thông báo khi có tài liệu mới, voucher và bài viết học tập hữu ích.
+                        </p>
+                        {!user && (
+                            <Link to="/register" className="btn-primary" style={{ padding: '10px 18px', fontSize: 13 }}>
+                                Đăng Ký Ngay
+                            </Link>
+                        )}
                     </div>
                 </div>
 
-                {/* Explore */}
-                <div>
-                    <h4 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Khám Phá</h4>
-                    <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {[['Trang Chủ', '/'], ['Trang Sản Phẩm', '/documents'], ['Blogs', '/blog']].map(([label, to]) => (
-                            <li key={to}><Link to={to} style={{ color: '#475569', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
-                                onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
-                                onMouseLeave={e => e.currentTarget.style.color = '#475569'}
-                            >{label}</Link></li>
+                <div style={{ borderTop: '1px solid #edf2f8', paddingTop: 22, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                    <p style={{ color: '#8a9aac', fontSize: 13 }}>© {new Date().getFullYear()} DiGiDoc. Tất cả quyền được bảo lưu.</p>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        {['Bảo Mật', 'Cookie', 'DMCA'].map(label => (
+                            <span key={label} style={{ color: '#526274', fontSize: 12, padding: '5px 11px', background: '#f3f7fd', borderRadius: 999, border: '1px solid #e4edf7' }}>{label}</span>
                         ))}
-                    </ul>
-                </div>
-
-                {/* Support */}
-                <div>
-                    <h4 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Hỗ Trợ</h4>
-                    <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {[['Câu Hỏi Thường Gặp', '/faq'], ['Liên Hệ', '/contact'], ['Điều Khoản Dịch Vụ', '/terms']].map(([label, to]) => (
-                            <li key={to}><Link to={to} style={{ color: '#475569', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
-                                onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
-                                onMouseLeave={e => e.currentTarget.style.color = '#475569'}
-                            >{label}</Link></li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Newsletter teaser */}
-                <div>
-                    <h4 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cập Nhật Mới Nhất</h4>
-                    <p style={{ color: '#475569', fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>
-                        Nhận thông báo khi có tài liệu mới và ưu đãi độc quyền.
-                    </p>
-                    <Link to="/register" style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                        padding: '8px 16px', borderRadius: 9,
-                        background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
-                        color: '#fff', fontWeight: 600, fontSize: 12,
-                        textDecoration: 'none', boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
-                    }}>
-                        Đăng Ký Ngay
-                    </Link>
+                    </div>
                 </div>
             </div>
-
-            {/* Bottom bar */}
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-                <p style={{ color: '#334155', fontSize: 12 }}>© {new Date().getFullYear()} DiGiDoc. Tất cả quyền được bảo lưu.</p>
-                <div style={{ display: 'flex', gap: 6 }}>
-                    {['Bảo Mật', 'Cookie', 'DMCA'].map(label => (
-                        <span key={label} style={{ color: '#334155', fontSize: 11, padding: '3px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 6 }}>{label}</span>
-                    ))}
-                </div>
-            </div>
-        </div>
-    </footer>
-);
+        </footer>
+    );
+};
 
 export default Footer;

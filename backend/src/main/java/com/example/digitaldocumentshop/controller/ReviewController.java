@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -100,14 +101,14 @@ public class ReviewController {
     @GetMapping("/document/{documentId}")
     public ResponseEntity<?> getDocumentReviews(@PathVariable Long documentId) {
         List<Review> reviews = reviewRepository.findByDocumentIdAndIsHiddenFalse(documentId);
-        List<Map<String, Object>> response = reviews.stream().map(r -> Map.of(
-                "id", r.getId(),
-                "rating", r.getRating(),
-                "comment", r.getComment(),
-                "adminReply", r.getAdminReply() != null ? r.getAdminReply() : "",
-                "createdAt", r.getCreatedAt(),
-                "user", Map.of("fullName", r.getUser().getFullName(), "email", r.getUser().getEmail())
-        )).toList();
+        List<Map<String, Object>> response = reviews.stream().map(this::toReviewResponse).toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllVisibleReviews() {
+        List<Review> reviews = reviewRepository.findByIsHiddenFalseOrderByCreatedAtDesc();
+        List<Map<String, Object>> response = reviews.stream().map(this::toReviewResponse).toList();
         return ResponseEntity.ok(response);
     }
 
@@ -141,5 +142,27 @@ public class ReviewController {
                     return m;
                 }).toList();
         return ResponseEntity.ok(reviewed);
+    }
+
+    private Map<String, Object> toReviewResponse(Review r) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", r.getId());
+        response.put("rating", r.getRating());
+        response.put("comment", r.getComment() != null ? r.getComment() : "");
+        response.put("adminReply", r.getAdminReply() != null ? r.getAdminReply() : "");
+        response.put("createdAt", r.getCreatedAt());
+
+        Map<String, Object> user = new HashMap<>();
+        user.put("fullName", r.getUser().getFullName());
+        user.put("email", r.getUser().getEmail());
+        response.put("user", user);
+
+        Map<String, Object> document = new HashMap<>();
+        document.put("id", r.getDocument().getId());
+        document.put("title", r.getDocument().getTitle());
+        document.put("slug", r.getDocument().getSlug());
+        response.put("document", document);
+
+        return response;
     }
 }

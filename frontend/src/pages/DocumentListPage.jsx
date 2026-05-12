@@ -1,13 +1,22 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getUploadUrl } from '../config/env';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { Search, ShoppingCart, ArrowUpDown, BookOpen, Filter, Star, ChevronDown } from 'lucide-react';
+import { ArrowUpDown, BookOpen, ChevronDown, Search, ShoppingCart, Star } from 'lucide-react';
 import { useCartStore } from '../context/cartStore';
 import { useAuthStore } from '../context/authStore';
+import { toast } from '../utils/toast';
+
+const clamp = (lines) => ({
+    display: '-webkit-box',
+    WebkitLineClamp: lines,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+});
 
 const DocumentListPage = () => {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
     const [documents, setDocuments] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,16 +24,17 @@ const DocumentListPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
     const { addToCart } = useCartStore();
+    const isAdmin = user?.roles?.includes('ROLE_ADMIN');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [docsRes, catsRes] = await Promise.all([
                     api.get('/documents'),
-                    api.get('/categories')
+                    api.get('/categories'),
                 ]);
-                setDocuments(docsRes.data);
-                setCategories(catsRes.data);
+                setDocuments(docsRes.data || []);
+                setCategories(catsRes.data || []);
             } catch (err) {
                 console.error('Không thể tải dữ liệu', err);
             } finally {
@@ -36,201 +46,271 @@ const DocumentListPage = () => {
 
     const filteredDocs = useMemo(() => {
         let result = documents.filter(doc => {
-            const matchSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (doc.categoryName && doc.categoryName.toLowerCase().includes(searchTerm.toLowerCase()));
+            const term = searchTerm.toLowerCase();
+            const matchSearch = doc.title.toLowerCase().includes(term) ||
+                (doc.categoryName && doc.categoryName.toLowerCase().includes(term));
             const matchCategory = selectedCategory === '' || doc.categoryName === selectedCategory;
             return matchSearch && matchCategory;
         });
-        if (sortOrder === 'asc') result = [...result].sort((a, b) => ((a.salePrice != null ? a.salePrice : a.price)) - ((b.salePrice != null ? b.salePrice : b.price)));
-        else if (sortOrder === 'desc') result = [...result].sort((a, b) => ((b.salePrice != null ? b.salePrice : b.price)) - ((a.salePrice != null ? a.salePrice : a.price)));
+        if (sortOrder === 'asc') {
+            result = [...result].sort((a, b) => ((a.salePrice != null ? a.salePrice : a.price)) - ((b.salePrice != null ? b.salePrice : b.price)));
+        } else if (sortOrder === 'desc') {
+            result = [...result].sort((a, b) => ((b.salePrice != null ? b.salePrice : b.price)) - ((a.salePrice != null ? a.salePrice : a.price)));
+        }
         return result;
     }, [documents, searchTerm, selectedCategory, sortOrder]);
 
-    const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
+    const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p || 0);
+
+    const handleAddToCart = (documentId) => {
+        if (!user) {
+            toast.warning('Vui lòng đăng nhập để thêm tài liệu vào giỏ hàng.');
+            navigate('/login');
+            return;
+        }
+        addToCart(documentId, 1);
+    };
+
+    const categoriesWithCount = [
+        { id: '', name: 'Tất cả', count: documents.length },
+        ...categories.map(c => ({ ...c, count: documents.filter(d => d.categoryName === c.name).length })),
+    ];
 
     const SkeletonCard = () => (
-        <div style={{ background: 'rgba(15,15,40,0.8)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 18, overflow: 'hidden' }}>
+        <div style={{ background: '#ffffff', border: '1px solid #dbe6f3', borderRadius: 8, overflow: 'hidden', boxShadow: '0 12px 30px rgba(27,55,100,0.08)' }}>
             <div className="skeleton" style={{ height: 180 }} />
             <div style={{ padding: 18 }}>
-                <div className="skeleton" style={{ height: 16, marginBottom: 10, width: '80%' }} />
-                <div className="skeleton" style={{ height: 12, marginBottom: 6, width: '60%' }} />
-                <div className="skeleton" style={{ height: 12, width: '40%' }} />
+                <div className="skeleton" style={{ height: 16, marginBottom: 10, width: '82%' }} />
+                <div className="skeleton" style={{ height: 12, marginBottom: 8, width: '62%' }} />
+                <div className="skeleton" style={{ height: 12, width: '42%' }} />
             </div>
         </div>
     );
 
     return (
-        <div style={{ position: 'relative', zIndex: 1 }}>
-            {/* Page header */}
-            <div style={{
-                background: 'linear-gradient(180deg, rgba(99,102,241,0.06) 0%, transparent 100%)',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                padding: '40px 24px 32px'
+        <div>
+            <header style={{
+                background: 'linear-gradient(180deg,#ffffff 0%,#eef6ff 100%)',
+                borderBottom: '1px solid #dbe6f3',
+                padding: '46px 24px 38px',
             }}>
                 <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                        <span className="pill pill-indigo"><BookOpen size={11} /> Kho Tài Liệu</span>
-                    </div>
-                    <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 900, color: '#f1f5f9', marginBottom: 8 }}>
-                        Khám Phá <span className="gradient-text">Tài Liệu Học Tập</span>
+                    <span className="pill pill-indigo" style={{ marginBottom: 14 }}>
+                        <BookOpen size={12} /> Kho tài liệu
+                    </span>
+                    <h1 style={{ fontSize: 'clamp(30px,4.5vw,46px)', fontWeight: 900, color: '#132033', margin: '0 0 10px', letterSpacing: 0 }}>
+                        Khám phá <span className="gradient-text">tài liệu học tập</span>
                     </h1>
-                    <p style={{ color: '#64748b', fontSize: 15 }}>
-                        {documents.length > 0 ? `${documents.length} tài liệu chất lượng cao cho học sinh & sinh viên` : 'Tải tài liệu phù hợp với nhu cầu của bạn'}
+                    <p style={{ color: '#526274', fontSize: 16, lineHeight: 1.7, maxWidth: 680, margin: 0 }}>
+                        {documents.length > 0
+                            ? `${documents.length} tài liệu cho học sinh, sinh viên và người đi làm.`
+                            : 'Tìm tài liệu phù hợp với mục tiêu học tập và công việc của bạn.'}
                     </p>
                 </div>
-            </div>
+            </header>
 
-            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 24px' }}>
-                {/* Search + Sort */}
-                <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-                    <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm tài liệu..."
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            className="input-dark"
-                            style={{ paddingLeft: 40 }}
-                        />
-                        <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4b5563' }} />
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                        <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}
-                            style={{ appearance: 'none', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '11px 40px 11px 40px', color: '#94a3b8', fontSize: 13, outline: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-                            <option value="default" style={{ background: '#1a1a3a' }}>Mặc định</option>
-                            <option value="asc" style={{ background: '#1a1a3a' }}>Giá: Thấp → Cao</option>
-                            <option value="desc" style={{ background: '#1a1a3a' }}>Giá: Cao → Thấp</option>
-                        </select>
-                        <ArrowUpDown size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4b5563', pointerEvents: 'none' }} />
-                        <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#4b5563', pointerEvents: 'none' }} />
-                    </div>
-                </div>
-
-                {/* Category pills */}
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    {[{ id: '', name: 'Tất cả', count: documents.length }, ...categories.map(c => ({ ...c, count: documents.filter(d => d.categoryName === c.name).length }))].map(cat => {
-                        const isActive = selectedCategory === cat.id.toString() || (cat.id === '' && selectedCategory === '');
-                        return (
-                            <button key={cat.id} onClick={() => setSelectedCategory(cat.id === '' ? '' : cat.name)}
+            <main style={{ maxWidth: 1200, margin: '0 auto', padding: '30px 24px 76px' }}>
+                <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #dbe6f3',
+                    borderRadius: 8,
+                    padding: 18,
+                    boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
+                    marginBottom: 24,
+                }}>
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+                        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
+                            <input
+                                type="text"
+                                placeholder="Tìm theo tên tài liệu hoặc danh mục..."
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                className="input-dark"
+                                style={{ paddingLeft: 42, height: 46 }}
+                            />
+                            <Search size={17} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#8a9aac' }} />
+                        </div>
+                        <div style={{ position: 'relative', minWidth: 190 }}>
+                            <select
+                                value={sortOrder}
+                                onChange={e => setSortOrder(e.target.value)}
                                 style={{
-                                    display: 'flex', alignItems: 'center', gap: 6,
-                                    padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600,
-                                    border: '1px solid',
-                                    borderColor: isActive ? 'rgba(99,102,241,0.6)' : 'rgba(255,255,255,0.08)',
-                                    background: isActive ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)',
-                                    color: isActive ? '#a5b4fc' : '#64748b',
-                                    cursor: 'pointer', transition: 'all 0.2s',
-                                    boxShadow: isActive ? '0 0 12px rgba(99,102,241,0.2)' : 'none'
+                                    width: '100%',
+                                    height: 46,
+                                    appearance: 'none',
+                                    background: '#ffffff',
+                                    border: '1px solid #dbe6f3',
+                                    borderRadius: 8,
+                                    padding: '0 40px 0 40px',
+                                    color: '#526274',
+                                    fontSize: 13,
+                                    outline: 'none',
+                                    cursor: 'pointer',
+                                    fontFamily: 'inherit',
+                                    fontWeight: 700,
                                 }}
                             >
-                                {cat.name}
-                                <span style={{
-                                    padding: '1px 7px', borderRadius: 999, fontSize: 11,
-                                    background: isActive ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.06)',
-                                    color: isActive ? '#c7d2fe' : '#475569'
-                                }}>{cat.count}</span>
-                            </button>
-                        );
-                    })}
+                                <option value="default">Mặc định</option>
+                                <option value="asc">Giá: Thấp đến cao</option>
+                                <option value="desc">Giá: Cao đến thấp</option>
+                            </select>
+                            <ArrowUpDown size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#8a9aac', pointerEvents: 'none' }} />
+                            <ChevronDown size={15} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: '#8a9aac', pointerEvents: 'none' }} />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        {categoriesWithCount.map(cat => {
+                            const isActive = cat.id === '' ? selectedCategory === '' : selectedCategory === cat.name;
+                            return (
+                                <button
+                                    key={cat.id || 'all'}
+                                    onClick={() => setSelectedCategory(cat.id === '' ? '' : cat.name)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 7,
+                                        padding: '8px 14px',
+                                        borderRadius: 999,
+                                        fontSize: 13,
+                                        fontWeight: 800,
+                                        border: '1px solid',
+                                        borderColor: isActive ? '#2563eb' : '#dbe6f3',
+                                        background: isActive ? '#e8f1ff' : '#ffffff',
+                                        color: isActive ? '#1d4ed8' : '#526274',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                    }}
+                                >
+                                    {cat.name}
+                                    <span style={{
+                                        minWidth: 22,
+                                        height: 22,
+                                        borderRadius: 999,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        padding: '0 7px',
+                                        background: isActive ? '#2563eb' : '#eef4fb',
+                                        color: isActive ? '#ffffff' : '#8a9aac',
+                                        fontSize: 11,
+                                    }}>
+                                        {cat.count}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
-                {/* Result info */}
                 {!loading && (
-                    <p style={{ color: '#475569', fontSize: 13, marginBottom: 20 }}>
-                        Hiển thị <span style={{ color: '#94a3b8', fontWeight: 600 }}>{filteredDocs.length}</span> tài liệu
-                        {selectedCategory && <> trong <span style={{ color: '#a5b4fc', fontWeight: 600 }}>{selectedCategory}</span></>}
+                    <p style={{ color: '#526274', fontSize: 13, marginBottom: 18 }}>
+                        Hiển thị <strong style={{ color: '#132033' }}>{filteredDocs.length}</strong> tài liệu
+                        {selectedCategory && <> trong <strong style={{ color: '#1d4ed8' }}>{selectedCategory}</strong></>}
                     </p>
                 )}
 
-                {/* Grid */}
                 {loading ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px,1fr))', gap: 20 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 20 }}>
                         {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
                     </div>
                 ) : filteredDocs.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '80px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: 20, border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <BookOpen size={48} color="#1e1e4a" style={{ marginBottom: 16 }} />
-                        <p style={{ color: '#475569', fontSize: 16 }}>Không tìm thấy tài liệu phù hợp.</p>
-                        <button onClick={() => { setSearchTerm(''); setSelectedCategory(''); }} style={{ marginTop: 16, color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}>Xóa bộ lọc</button>
+                    <div style={{ textAlign: 'center', padding: '74px 20px', background: '#ffffff', borderRadius: 8, border: '1px solid #dbe6f3', boxShadow: '0 14px 34px rgba(27,55,100,0.08)' }}>
+                        <BookOpen size={52} color="#9ab0cb" style={{ marginBottom: 16 }} />
+                        <h2 style={{ color: '#132033', fontSize: 20, fontWeight: 900, margin: '0 0 8px' }}>Không tìm thấy tài liệu</h2>
+                        <p style={{ color: '#526274', fontSize: 14, marginBottom: 18 }}>Thử đổi từ khóa hoặc chọn lại danh mục.</p>
+                        <button onClick={() => { setSearchTerm(''); setSelectedCategory(''); }} className="btn-secondary" style={{ padding: '10px 18px' }}>
+                            Xóa bộ lọc
+                        </button>
                     </div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px,1fr))', gap: 20 }}>
-                        {filteredDocs.map(doc => (
-                            <Link to={`/documents/${doc.slug}`} key={doc.id} className="product-card">
-                                {/* Thumbnail */}
-                                <div className="card-thumb" style={{ height: 180, background: '#0d0d2b', position: 'relative' }}>
-                                    {doc.thumbnailPath ? (
-                                        <img src={(getUploadUrl(doc.thumbnailPath) || "")} alt={doc.title}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8 }}>
-                                            <BookOpen size={36} color="#1e1e4a" />
-                                            <span style={{ color: '#1e2d5a', fontSize: 11 }}>Chưa có ảnh</span>
-                                        </div>
-                                    )}
-                                    {doc.salePrice != null && (
-                                        <div style={{ position: 'absolute', top: 10, left: 10, background: 'linear-gradient(135deg,#ef4444,#ec4899)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 6, letterSpacing: 0.5 }}>SALE</div>
-                                    )}
-                                    {doc.categoryName && (
-                                        <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', color: '#a5b4fc', fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 6, border: '1px solid rgba(99,102,241,0.25)' }}>
-                                            {doc.categoryName}
-                                        </div>
-                                    )}
-                                    {/* gradient overlay */}
-                                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(transparent, rgba(8,8,24,0.7))' }} />
-                                </div>
-
-                                {/* Content */}
-                                <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <h3 style={{ fontWeight: 700, fontSize: 14, color: '#e2e8f0', marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5 }}>
-                                        {doc.title}
-                                    </h3>
-                                    <p style={{ color: '#475569', fontSize: 12, marginBottom: 14, flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.6 }}>
-                                        {doc.shortDescription || 'Tài liệu học tập chất lượng cao'}
-                                    </p>
-
-                                    {/* Rating */}
-                                    {doc.averageRating > 0 && (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
-                                            <div style={{ display: 'flex', gap: 1 }}>
-                                                {[1, 2, 3, 4, 5].map(s => (
-                                                    <Star key={s} size={11} fill={s <= Math.round(doc.averageRating) ? '#fbbf24' : 'none'} color={s <= Math.round(doc.averageRating) ? '#fbbf24' : '#374151'} />
-                                                ))}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 20 }}>
+                        {filteredDocs.map(doc => {
+                            const price = doc.salePrice != null ? doc.salePrice : doc.price;
+                            return (
+                                <Link to={`/documents/${doc.slug}`} key={doc.id} className="product-card">
+                                    <div className="card-thumb" style={{ height: 184, background: '#eef6ff', position: 'relative' }}>
+                                        {doc.thumbnailPath ? (
+                                            <img src={getUploadUrl(doc.thumbnailPath) || ''} alt={doc.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8, color: '#9ab0cb' }}>
+                                                <BookOpen size={38} />
+                                                <span style={{ fontSize: 12 }}>Chưa có ảnh</span>
                                             </div>
-                                            <span style={{ color: '#64748b', fontSize: 11 }}>{doc.averageRating.toFixed(1)}</span>
-                                        </div>
-                                    )}
-
-                                    {/* Price + Cart */}
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div>
-                                            {doc.salePrice != null ? (
-                                                <div>
-                                                    <span style={{ color: '#f87171', fontWeight: 800, fontSize: 16 }}>{formatPrice(doc.salePrice)}</span>
-                                                    <span style={{ color: '#334155', fontSize: 11, textDecoration: 'line-through', marginLeft: 7 }}>{formatPrice(doc.price)}</span>
-                                                </div>
-                                            ) : (
-                                                <span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16 }}>{formatPrice(doc.price)}</span>
-                                            )}
-                                        </div>
-                                        {(!user || !user.roles?.includes('ROLE_ADMIN')) && (
-                                            <button
-                                                onClick={e => { e.preventDefault(); e.stopPropagation(); addToCart(doc.id, 1); }}
-                                                style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', color: '#6366f1', cursor: 'pointer', transition: 'all 0.2s' }}
-                                                onMouseEnter={e => { e.currentTarget.style.background = '#6366f1'; e.currentTarget.style.color = '#fff'; }}
-                                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.color = '#6366f1'; }}
-                                                title="Thêm vào giỏ hàng"
-                                            >
-                                                <ShoppingCart size={16} />
-                                            </button>
+                                        )}
+                                        {doc.salePrice != null && (
+                                            <span style={{ position: 'absolute', top: 10, left: 10, background: '#f43f5e', color: '#fff', fontSize: 10, fontWeight: 900, padding: '4px 8px', borderRadius: 6 }}>
+                                                SALE
+                                            </span>
+                                        )}
+                                        {doc.categoryName && (
+                                            <span style={{ position: 'absolute', top: 10, right: 10, background: '#ffffff', color: '#1d4ed8', fontSize: 11, fontWeight: 800, padding: '4px 9px', borderRadius: 6, border: '1px solid #bfdbfe' }}>
+                                                {doc.categoryName}
+                                            </span>
                                         )}
                                     </div>
-                                </div>
-                            </Link>
-                        ))}
+
+                                    <div style={{ padding: '17px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <h3 style={{ fontWeight: 900, fontSize: 15, color: '#132033', marginBottom: 8, lineHeight: 1.45, ...clamp(2) }}>
+                                            {doc.title}
+                                        </h3>
+                                        <p style={{ color: '#526274', fontSize: 13, marginBottom: 14, flex: 1, lineHeight: 1.6, ...clamp(2) }}>
+                                            {doc.shortDescription || 'Tài liệu học tập được trình bày gọn, dễ đọc và dễ áp dụng.'}
+                                        </p>
+
+                                        {doc.averageRating > 0 && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 12 }}>
+                                                <div style={{ display: 'flex', gap: 1 }}>
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <Star key={s} size={12} fill={s <= Math.round(doc.averageRating) ? '#f59e0b' : 'none'} color={s <= Math.round(doc.averageRating) ? '#f59e0b' : '#cbd5e1'} />
+                                                    ))}
+                                                </div>
+                                                <span style={{ color: '#526274', fontSize: 12, fontWeight: 800 }}>{doc.averageRating.toFixed(1)}</span>
+                                            </div>
+                                        )}
+
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                                            <div>
+                                                <span style={{ color: doc.salePrice != null ? '#e11d48' : '#2563eb', fontWeight: 900, fontSize: 17 }}>
+                                                    {formatPrice(price)}
+                                                </span>
+                                                {doc.salePrice != null && (
+                                                    <span style={{ color: '#8a9aac', fontSize: 12, textDecoration: 'line-through', marginLeft: 7 }}>
+                                                        {formatPrice(doc.price)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {!isAdmin && (
+                                                <button
+                                                    onClick={e => { e.preventDefault(); e.stopPropagation(); handleAddToCart(doc.id); }}
+                                                    style={{
+                                                        width: 38,
+                                                        height: 38,
+                                                        borderRadius: 8,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: '#e8f1ff',
+                                                        border: '1px solid #bfdbfe',
+                                                        color: '#2563eb',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s',
+                                                    }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = '#2563eb'; e.currentTarget.style.color = '#fff'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = '#e8f1ff'; e.currentTarget.style.color = '#2563eb'; }}
+                                                    title="Thêm vào giỏ hàng"
+                                                >
+                                                    <ShoppingCart size={17} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
                     </div>
                 )}
-            </div>
+            </main>
         </div>
     );
 };

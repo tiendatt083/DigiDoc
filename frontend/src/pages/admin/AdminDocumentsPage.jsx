@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { getUploadUrl } from '../../config/env';
-import { Plus, Pencil, Trash2, Search, X, Check, Eye, EyeOff, Image } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, X, Check, Eye, EyeOff, Image, FileText } from 'lucide-react';
 import {
   adminGetAllDocuments, adminCreateDocument, adminUpdateDocument,
   adminDeleteDocument, getAllCategories
@@ -214,7 +214,7 @@ export default function AdminDocumentsPage() {
       {/* Header */}
       <div className="admin-page-header">
         <div>
-          <h1>📄 Quản lý tài liệu</h1>
+          <h1>Quản lý tài liệu</h1>
           <p>Tổng: <strong>{documents.length}</strong> tài liệu ({documents.filter(d => d.status === 'ACTIVE').length} đang hiển thị)</p>
         </div>
         <button className="btn-admin-primary" onClick={openCreate}>
@@ -257,13 +257,13 @@ export default function AdminDocumentsPage() {
                 </tr>
               ) : filtered.map((doc, i) => (
                 <tr key={doc.id}>
-                  <td style={{ color: '#64748b' }}>{i + 1}</td>
+                  <td style={{ color: '#526274' }}>{i + 1}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       {/* Thumbnail */}
                       <div style={{
                         width: 48, height: 48, borderRadius: 8, overflow: 'hidden', flexShrink: 0,
-                        background: 'rgba(99,102,241,0.1)',
+                        background: '#eef6ff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                       }}>
                         {doc.thumbnailPath ? (
@@ -274,28 +274,28 @@ export default function AdminDocumentsPage() {
                             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                           />
                         ) : null}
-                        <span style={{ fontSize: 20, display: doc.thumbnailPath ? 'none' : 'flex' }}>📄</span>
+                        <span style={{ color: '#2563eb', display: doc.thumbnailPath ? 'none' : 'flex' }}><FileText size={20}/></span>
                       </div>
                       <div>
-                        <p style={{ color: '#f1f5f9', fontWeight: 600, margin: 0, fontSize: 13 }}>{doc.title}</p>
-                        <p style={{ color: '#64748b', margin: 0, fontSize: 11 }}>{doc.fileType || 'N/A'}</p>
+                        <p style={{ color: '#132033', fontWeight: 700, margin: 0, fontSize: 13 }}>{doc.title}</p>
+                        <p style={{ color: '#526274', margin: 0, fontSize: 11 }}>{doc.fileType || 'N/A'}</p>
                       </div>
                     </div>
                   </td>
-                  <td style={{ color: '#94a3b8', fontSize: 13 }}>{doc.categoryName || '—'}</td>
+                  <td style={{ color: '#526274', fontSize: 13 }}>{doc.categoryName || '—'}</td>
                   <td>
                     <div>
                       {doc.salePrice != null && Number(doc.salePrice) < Number(doc.price) ? (
                         <>
-                          <p style={{ color: '#f87171', fontWeight: 700, margin: 0, fontSize: 13 }}>{formatVND(doc.salePrice)}</p>
-                          <p style={{ color: '#64748b', margin: 0, fontSize: 11, textDecoration: 'line-through' }}>{formatVND(doc.price)}</p>
+                          <p style={{ color: '#e11d48', fontWeight: 800, margin: 0, fontSize: 13 }}>{formatVND(doc.salePrice)}</p>
+                          <p style={{ color: '#8a9aac', margin: 0, fontSize: 11, textDecoration: 'line-through' }}>{formatVND(doc.price)}</p>
                         </>
                       ) : (
-                        <p style={{ color: '#a5b4fc', fontWeight: 700, margin: 0, fontSize: 13 }}>{formatVND(doc.price)}</p>
+                        <p style={{ color: '#2563eb', fontWeight: 800, margin: 0, fontSize: 13 }}>{formatVND(doc.price)}</p>
                       )}
                     </div>
                   </td>
-                  <td style={{ color: '#94a3b8', textAlign: 'center' }}>{doc.totalSales || 0}</td>
+                  <td style={{ color: '#526274', textAlign: 'center' }}>{doc.totalSales || 0}</td>
                   <td>
                     {/* Click để toggle trạng thái */}
                     <button
@@ -332,7 +332,7 @@ export default function AdminDocumentsPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box wide" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editDoc ? '✏️ Sửa tài liệu' : '➕ Thêm tài liệu mới'}</h2>
+              <h2>{editDoc ? 'Sửa tài liệu' : 'Thêm tài liệu mới'}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}><X size={18}/></button>
             </div>
 
@@ -405,8 +405,8 @@ export default function AdminDocumentsPage() {
                     value={form.status}
                     onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
                   >
-                    <option value="ACTIVE">👁️ Hiển thị</option>
-                    <option value="HIDDEN">🙈 Ẩn</option>
+                    <option value="ACTIVE">Hiển thị</option>
+                    <option value="HIDDEN">Ẩn</option>
                   </select>
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function AdminDocumentsPage() {
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
                     onChange={e => setForm(f => ({ ...f, file: e.target.files[0] }))}
                   />
-                  <small style={{ color: '#64748b', fontSize: 11 }}>Hỗ trợ: PDF, Word, Excel, PowerPoint</small>
+                  <small style={{ color: '#526274', fontSize: 11 }}>Hỗ trợ: PDF, Word, Excel, PowerPoint</small>
                 </div>
               )}
 

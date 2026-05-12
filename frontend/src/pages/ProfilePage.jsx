@@ -1,29 +1,48 @@
 import { useState, useEffect } from 'react';
-import { User, Phone, Mail, Award, Lock, Check, AlertCircle, ShoppingBag, Download } from 'lucide-react';
+import { AlertCircle, Award, Check, Download, Lock, Mail, Phone, ShoppingBag, User } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuthStore } from '../context/authStore';
 import { toast } from '../utils/toast';
 
-export default function ProfilePage() {
-  const { user, logout } = useAuthStore();
-  const navigate = useNavigate();
+const cardStyle = {
+  background: '#ffffff',
+  border: '1px solid #dbe6f3',
+  borderRadius: 8,
+  boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
+};
 
-  // Profile data from server
+const fieldStyle = {
+  width: '100%',
+  padding: '11px 14px',
+  borderRadius: 8,
+  fontSize: 14,
+  background: '#ffffff',
+  border: '1px solid #dbe6f3',
+  color: '#132033',
+  outline: 'none',
+  boxSizing: 'border-box',
+};
+
+const labelStyle = {
+  color: '#526274',
+  fontSize: 13,
+  fontWeight: 800,
+  display: 'block',
+  marginBottom: 6,
+};
+
+export default function ProfilePage() {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Edit profile form
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({ fullName: '', phoneNumber: '' });
   const [saving, setSaving] = useState(false);
-
-  // Change password form
   const [pwdForm, setPwdForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [pwdLoading, setPwdLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
-
-  // Order summary
   const [orderCount, setOrderCount] = useState(0);
 
   useEffect(() => {
@@ -33,7 +52,7 @@ export default function ProfilePage() {
     }
     fetchProfile();
     fetchOrderCount();
-  }, [user]);
+  }, [user, navigate]);
 
   const fetchProfile = async () => {
     try {
@@ -52,7 +71,7 @@ export default function ProfilePage() {
       const res = await api.get('/orders/my-orders');
       setOrderCount(res.data?.length || 0);
     } catch {
-      // silent - không ảnh hưởng nếu lỗi
+      // Không ảnh hưởng tới trang hồ sơ.
     }
   };
 
@@ -106,215 +125,127 @@ export default function ProfilePage() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 20px' }}>
-      <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8, color: '#f1f5f9' }}>
-        👤 Thông tin cá nhân
-      </h1>
-      <p style={{ color: '#64748b', marginBottom: 32 }}>Quản lý hồ sơ và bảo mật tài khoản</p>
+    <main style={{ maxWidth: 980, margin: '0 auto', padding: '42px 24px 78px' }}>
+      <header style={{ marginBottom: 28 }}>
+        <span className="pill pill-indigo" style={{ marginBottom: 12 }}>
+          <User size={12}/> Tài khoản
+        </span>
+        <h1 style={{ fontSize: 34, fontWeight: 900, margin: '0 0 8px', color: '#132033', letterSpacing: 0 }}>
+          Thông tin cá nhân
+        </h1>
+        <p style={{ color: '#526274', margin: 0, lineHeight: 1.7 }}>Quản lý hồ sơ, đơn hàng, tài liệu đã mua và bảo mật tài khoản.</p>
+      </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 24 }}>
-        {/* ===== LEFT: Avatar + Stats ===== */}
-        <div>
-          {/* Avatar card */}
-          <div style={{
-            background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.2)',
-            borderRadius: 16, padding: 28, textAlign: 'center', marginBottom: 16
-          }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 22, alignItems: 'start' }}>
+        <aside>
+          <section style={{ ...cardStyle, padding: 26, textAlign: 'center', marginBottom: 16 }}>
             <div style={{
-              width: 88, height: 88, borderRadius: '50%', margin: '0 auto 16px',
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 36, color: '#fff', fontWeight: 700
+              width: 88,
+              height: 88,
+              borderRadius: 8,
+              margin: '0 auto 16px',
+              background: 'linear-gradient(135deg,#2563eb,#14b8a6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 36,
+              color: '#fff',
+              fontWeight: 900,
+              boxShadow: '0 16px 32px rgba(37,99,235,0.18)',
             }}>
               {profile?.fullName?.charAt(0)?.toUpperCase() || '?'}
             </div>
-            <p style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 18, margin: 0 }}>
-              {profile?.fullName}
+            <p style={{ color: '#132033', fontWeight: 900, fontSize: 19, margin: 0 }}>{profile?.fullName}</p>
+            <p style={{ color: '#2563eb', fontSize: 12, marginTop: 6, fontWeight: 800 }}>
+              {profile?.role === 'ROLE_ADMIN' ? 'Quản trị viên' : 'Thành viên'}
             </p>
-            <p style={{ color: '#6366f1', fontSize: 12, marginTop: 4 }}>
-              {profile?.role === 'ROLE_ADMIN' ? '👑 Quản trị viên' : '👤 Thành viên'}
-            </p>
-            <p style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>{profile?.email}</p>
-          </div>
+            <p style={{ color: '#8a9aac', fontSize: 12, marginTop: 6 }}>{profile?.email}</p>
+          </section>
 
-          {/* Quick stats */}
-          <div style={{
-            background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.2)',
-            borderRadius: 16, padding: 20
-          }}>
-            <p style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>
-              Tóm tắt
+          <section style={{ ...cardStyle, padding: 18 }}>
+            <p style={{ color: '#526274', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', marginBottom: 14 }}>
+              Tóm tắt tài khoản
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Link to="/my-orders" style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 16px', borderRadius: 10, background: 'rgba(99,102,241,0.08)',
-                textDecoration: 'none', transition: 'background 0.2s'
-              }}>
-                <div style={{ background: 'rgba(99,102,241,0.2)', borderRadius: 8, padding: 8 }}>
-                  <ShoppingBag size={18} style={{ color: '#6366f1' }}/>
-                </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Link to="/my-orders" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 13, borderRadius: 8, background: '#eef6ff', textDecoration: 'none', border: '1px solid #dbeafe' }}>
+                <span style={{ background: '#dbeafe', borderRadius: 8, padding: 9, color: '#2563eb' }}><ShoppingBag size={18}/></span>
                 <div>
-                  <p style={{ color: '#94a3b8', fontSize: 11, margin: 0 }}>Đơn hàng</p>
-                  <p style={{ color: '#f1f5f9', fontWeight: 700, margin: 0 }}>{orderCount}</p>
+                  <p style={{ color: '#526274', fontSize: 11, margin: 0, fontWeight: 800 }}>Đơn hàng</p>
+                  <p style={{ color: '#132033', fontWeight: 900, margin: 0 }}>{orderCount}</p>
                 </div>
               </Link>
-              <Link to="/my-downloads" style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)',
-                textDecoration: 'none'
-              }}>
-                <div style={{ background: 'rgba(16,185,129,0.2)', borderRadius: 8, padding: 8 }}>
-                  <Download size={18} style={{ color: '#10b981' }}/>
-                </div>
+              <Link to="/my-downloads" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 13, borderRadius: 8, background: '#e8fbf5', textDecoration: 'none', border: '1px solid #b7eadc' }}>
+                <span style={{ background: '#ccfbf1', borderRadius: 8, padding: 9, color: '#0f766e' }}><Download size={18}/></span>
                 <div>
-                  <p style={{ color: '#94a3b8', fontSize: 11, margin: 0 }}>Sản phẩm đã mua</p>
-                  <p style={{ color: '#f1f5f9', fontWeight: 700, margin: 0 }}>Xem →</p>
+                  <p style={{ color: '#526274', fontSize: 11, margin: 0, fontWeight: 800 }}>Sản phẩm đã mua</p>
+                  <p style={{ color: '#132033', fontWeight: 900, margin: 0 }}>Xem tài liệu</p>
                 </div>
               </Link>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 16px', borderRadius: 10, background: 'rgba(245,158,11,0.08)'
-              }}>
-                <div style={{ background: 'rgba(245,158,11,0.2)', borderRadius: 8, padding: 8 }}>
-                  <Award size={18} style={{ color: '#f59e0b' }}/>
-                </div>
+              <Link to="/my-points" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 13, borderRadius: 8, background: '#fff7e8', textDecoration: 'none', border: '1px solid #fed7aa' }}>
+                <span style={{ background: '#ffedd5', borderRadius: 8, padding: 9, color: '#b45309' }}><Award size={18}/></span>
                 <div>
-                  <p style={{ color: '#94a3b8', fontSize: 11, margin: 0 }}>Điểm thưởng</p>
-                  <p style={{ color: '#f59e0b', fontWeight: 700, margin: 0 }}>{profile?.rewardPoints || 0} điểm</p>
+                  <p style={{ color: '#526274', fontSize: 11, margin: 0, fontWeight: 800 }}>Điểm thưởng</p>
+                  <p style={{ color: '#b45309', fontWeight: 900, margin: 0 }}>{profile?.rewardPoints || 0} điểm</p>
                 </div>
-              </div>
+              </Link>
             </div>
-          </div>
-        </div>
+          </section>
+        </aside>
 
-        {/* ===== RIGHT: Forms ===== */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {/* Profile info form */}
-          <div style={{
-            background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.2)',
-            borderRadius: 16, padding: 28
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 18, margin: 0 }}>
-                📋 Thông tin cơ bản
-              </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <section style={{ ...cardStyle, padding: 26 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 22, flexWrap: 'wrap' }}>
+              <h2 style={{ color: '#132033', fontWeight: 900, fontSize: 19, margin: 0 }}>Thông tin cơ bản</h2>
               {!editMode && (
-                <button
-                  onClick={() => setEditMode(true)}
-                  style={{
-                    background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)',
-                    color: '#a5b4fc', padding: '6px 16px', borderRadius: 8, cursor: 'pointer',
-                    fontSize: 13, fontWeight: 600
-                  }}
-                >
-                  ✏️ Chỉnh sửa
+                <button onClick={() => setEditMode(true)} className="btn-secondary" style={{ padding: '8px 15px', fontSize: 13 }}>
+                  Chỉnh sửa
                 </button>
               )}
             </div>
 
             {!editMode ? (
-              /* View mode */
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
-                  { icon: <User size={16}/>, label: 'Họ và tên', value: profile?.fullName },
-                  { icon: <Mail size={16}/>, label: 'Email', value: profile?.email },
-                  { icon: <Phone size={16}/>, label: 'Số điện thoại', value: profile?.phoneNumber || 'Chưa cập nhật' },
+                  { icon: <User size={17}/>, label: 'Họ và tên', value: profile?.fullName },
+                  { icon: <Mail size={17}/>, label: 'Email', value: profile?.email },
+                  { icon: <Phone size={17}/>, label: 'Số điện thoại', value: profile?.phoneNumber || 'Chưa cập nhật' },
                 ].map(({ icon, label, value }) => (
-                  <div key={label} style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '14px 16px', background: 'rgba(255,255,255,0.03)',
-                    borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)'
-                  }}>
-                    <span style={{ color: '#6366f1' }}>{icon}</span>
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#f8fbff', borderRadius: 8, border: '1px solid #dbe6f3' }}>
+                    <span style={{ color: '#2563eb' }}>{icon}</span>
                     <div>
-                      <p style={{ color: '#64748b', fontSize: 11, margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
-                      <p style={{ color: '#f1f5f9', fontWeight: 600, margin: 0, fontSize: 14 }}>{value}</p>
+                      <p style={{ color: '#8a9aac', fontSize: 11, margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>{label}</p>
+                      <p style={{ color: '#132033', fontWeight: 800, margin: 0, fontSize: 14 }}>{value}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              /* Edit mode */
               <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <label style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>
-                    Họ và tên *
-                  </label>
-                  <input
-                    required
-                    value={profileForm.fullName}
-                    onChange={e => setProfileForm(f => ({ ...f, fullName: e.target.value }))}
-                    style={{
-                      width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14,
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(99,102,241,0.3)',
-                      color: '#f1f5f9', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
+                  <label style={labelStyle}>Họ và tên *</label>
+                  <input required value={profileForm.fullName} onChange={e => setProfileForm(f => ({ ...f, fullName: e.target.value }))} style={fieldStyle} />
                 </div>
                 <div>
-                  <label style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>
-                    Số điện thoại
-                  </label>
-                  <input
-                    value={profileForm.phoneNumber}
-                    onChange={e => setProfileForm(f => ({ ...f, phoneNumber: e.target.value }))}
-                    placeholder="0xxxxxxxxx"
-                    style={{
-                      width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14,
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(99,102,241,0.3)',
-                      color: '#f1f5f9', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
+                  <label style={labelStyle}>Số điện thoại</label>
+                  <input value={profileForm.phoneNumber} onChange={e => setProfileForm(f => ({ ...f, phoneNumber: e.target.value }))} placeholder="0xxxxxxxxx" style={fieldStyle} />
                 </div>
-                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                  <button
-                    type="button"
-                    onClick={() => setEditMode(false)}
-                    style={{
-                      padding: '8px 20px', borderRadius: 8, background: 'transparent',
-                      border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8',
-                      cursor: 'pointer', fontWeight: 600, fontSize: 13
-                    }}
-                  >
-                    Huỷ
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                  <button type="button" onClick={() => setEditMode(false)} className="btn-secondary" style={{ padding: '9px 18px' }}>
+                    Hủy
                   </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    style={{
-                      padding: '8px 20px', borderRadius: 8,
-                      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                      border: 'none', color: '#fff', cursor: 'pointer',
-                      fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6
-                    }}
-                  >
-                    <Check size={14}/>
-                    {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                  <button type="submit" disabled={saving} className="btn-primary" style={{ padding: '9px 18px' }}>
+                    <Check size={15}/>{saving ? 'Đang lưu...' : 'Lưu thay đổi'}
                   </button>
                 </div>
               </form>
             )}
-          </div>
+          </section>
 
-          {/* Change password */}
-          <div style={{
-            background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.2)',
-            borderRadius: 16, padding: 28
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showPwd ? 24 : 0 }}>
-              <h2 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 18, margin: 0 }}>
-                🔒 Đổi mật khẩu
-              </h2>
-              <button
-                onClick={() => setShowPwd(v => !v)}
-                style={{
-                  background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                  color: '#f87171', padding: '6px 16px', borderRadius: 8, cursor: 'pointer',
-                  fontSize: 13, fontWeight: 600
-                }}
-              >
-                {showPwd ? '✕ Đóng' : '🔑 Đổi mật khẩu'}
+          <section style={{ ...cardStyle, padding: 26 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: showPwd ? 22 : 0, flexWrap: 'wrap' }}>
+              <h2 style={{ color: '#132033', fontWeight: 900, fontSize: 19, margin: 0 }}>Đổi mật khẩu</h2>
+              <button onClick={() => setShowPwd(v => !v)} className={showPwd ? 'btn-secondary' : 'btn-primary'} style={{ padding: '8px 15px', fontSize: 13 }}>
+                <Lock size={15}/>{showPwd ? 'Đóng' : 'Đổi mật khẩu'}
               </button>
             </div>
 
@@ -326,45 +257,23 @@ export default function ProfilePage() {
                   { label: 'Xác nhận mật khẩu mới', key: 'confirmPassword' },
                 ].map(({ label, key }) => (
                   <div key={key}>
-                    <label style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 6 }}>
-                      {label}
-                    </label>
-                    <input
-                      required
-                      type="password"
-                      value={pwdForm[key]}
-                      onChange={e => setPwdForm(f => ({ ...f, [key]: e.target.value }))}
-                      style={{
-                        width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14,
-                        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(99,102,241,0.3)',
-                        color: '#f1f5f9', outline: 'none', boxSizing: 'border-box'
-                      }}
-                    />
+                    <label style={labelStyle}>{label}</label>
+                    <input required type="password" value={pwdForm[key]} onChange={e => setPwdForm(f => ({ ...f, [key]: e.target.value }))} style={fieldStyle} />
                   </div>
                 ))}
                 {pwdForm.newPassword && pwdForm.confirmPassword && pwdForm.newPassword !== pwdForm.confirmPassword && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#f87171', fontSize: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e11d48', fontSize: 12, fontWeight: 800 }}>
                     <AlertCircle size={14}/> Mật khẩu xác nhận không khớp
                   </div>
                 )}
-                <button
-                  type="submit"
-                  disabled={pwdLoading}
-                  style={{
-                    padding: '10px', borderRadius: 8,
-                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                    border: 'none', color: '#fff', cursor: 'pointer',
-                    fontWeight: 700, fontSize: 14, alignSelf: 'flex-end',
-                    paddingLeft: 24, paddingRight: 24
-                  }}
-                >
-                  {pwdLoading ? 'Đang đổi...' : '🔒 Xác nhận đổi mật khẩu'}
+                <button type="submit" disabled={pwdLoading} className="btn-primary" style={{ alignSelf: 'flex-end', padding: '10px 22px' }}>
+                  {pwdLoading ? 'Đang đổi...' : 'Xác nhận đổi mật khẩu'}
                 </button>
               </form>
             )}
-          </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

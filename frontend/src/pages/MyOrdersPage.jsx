@@ -2,39 +2,45 @@ import { useState, useEffect } from 'react';
 import { getUploadUrl } from '../config/env';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { Package, Download, CreditCard, Clock, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle, Clock, CreditCard, Download, Package, RefreshCw, XCircle } from 'lucide-react';
 
 const STATUS_MAP = {
   PENDING_PAYMENT: {
     label: 'Chờ thanh toán',
     icon: <Clock size={12}/>,
-    cls: { bg: '#fef3c7', color: '#d97706', border: '#fcd34d' },
+    cls: { bg: '#fff7e8', color: '#b45309', border: '#fed7aa' },
   },
   PAID: {
     label: 'Đã thanh toán',
     icon: <CheckCircle size={12}/>,
-    cls: { bg: '#d1fae5', color: '#059669', border: '#6ee7b7' },
+    cls: { bg: '#e8fbf5', color: '#0f766e', border: '#b7eadc' },
   },
   CANCELLED: {
     label: 'Đã hủy',
     icon: <XCircle size={12}/>,
-    cls: { bg: '#fee2e2', color: '#dc2626', border: '#fca5a5' },
+    cls: { bg: '#fff1f2', color: '#e11d48', border: '#fecdd3' },
   },
   EXPIRED: {
     label: 'Hết hạn',
     icon: <XCircle size={12}/>,
-    cls: { bg: '#f1f5f9', color: '#64748b', border: '#cbd5e1' },
+    cls: { bg: '#eef4fb', color: '#526274', border: '#dbe6f3' },
   },
 };
 
 const StatusBadge = ({ status }) => {
-  const s = STATUS_MAP[status] || { label: status, icon: null, cls: { bg: '#f1f5f9', color: '#64748b', border: '#cbd5e1' } };
+  const s = STATUS_MAP[status] || { label: status, icon: null, cls: { bg: '#eef4fb', color: '#526274', border: '#dbe6f3' } };
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700,
-      background: s.cls.bg, color: s.cls.color,
-      border: `1px solid ${s.cls.border}`
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 5,
+      padding: '5px 11px',
+      borderRadius: 999,
+      fontSize: 12,
+      fontWeight: 900,
+      background: s.cls.bg,
+      color: s.cls.color,
+      border: `1px solid ${s.cls.border}`,
     }}>
       {s.icon} {s.label}
     </span>
@@ -90,13 +96,12 @@ const MyOrdersPage = () => {
     }
   };
 
-  /** Tiếp tục thanh toán — chuyển đến trang payment với orderCode */
   const handleContinuePayment = (orderCode) => {
     navigate(`/payment/${orderCode}`);
   };
 
   const formatPrice = (price) =>
-    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0);
 
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -110,154 +115,119 @@ const MyOrdersPage = () => {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 20px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+    <main style={{ maxWidth: 980, margin: '0 auto', padding: '42px 24px 78px' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, marginBottom: 30, flexWrap: 'wrap' }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>📦 Đơn hàng của tôi</h1>
-          <p style={{ color: '#64748b', marginTop: 4 }}>Tổng: {orders.length} đơn hàng</p>
+          <span className="pill pill-indigo" style={{ marginBottom: 12 }}>
+            <Package size={12}/> Lịch sử mua
+          </span>
+          <h1 style={{ fontSize: 34, fontWeight: 900, color: '#132033', margin: '0 0 6px', letterSpacing: 0 }}>Đơn hàng của tôi</h1>
+          <p style={{ color: '#526274', margin: 0 }}>Tổng: {orders.length} đơn hàng</p>
         </div>
-        <button
-          onClick={fetchOrders}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '8px 16px', borderRadius: 8,
-            background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
-            color: '#a5b4fc', cursor: 'pointer', fontSize: 13, fontWeight: 600
-          }}
-        >
-          <RefreshCw size={14}/> Làm mới
+        <button onClick={fetchOrders} className="btn-secondary" style={{ padding: '10px 16px' }}>
+          <RefreshCw size={15}/> Làm mới
         </button>
-      </div>
+      </header>
 
       {orders.length === 0 ? (
         <div style={{
-          textAlign: 'center', padding: '64px 32px',
-          background: 'rgba(15,23,42,0.8)', borderRadius: 16,
-          border: '1px solid rgba(99,102,241,0.1)'
+          textAlign: 'center',
+          padding: '68px 28px',
+          background: '#ffffff',
+          borderRadius: 8,
+          border: '1px solid #dbe6f3',
+          boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
         }}>
-          <Package size={56} style={{ color: '#334155', margin: '0 auto 16px' }}/>
-          <p style={{ color: '#64748b', fontSize: 16, marginBottom: 20 }}>Bạn chưa có đơn hàng nào</p>
-          <Link to="/documents" style={{
-            display: 'inline-block', padding: '10px 24px', borderRadius: 8,
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            color: '#fff', textDecoration: 'none', fontWeight: 700
-          }}>
-            Mua sản phẩm ngay →
+          <Package size={56} color="#9ab0cb" style={{ margin: '0 auto 16px' }}/>
+          <h2 style={{ color: '#132033', fontSize: 20, fontWeight: 900, margin: '0 0 8px' }}>Bạn chưa có đơn hàng nào</h2>
+          <p style={{ color: '#526274', fontSize: 15, marginBottom: 22 }}>Khám phá kho tài liệu và bắt đầu lưu tài liệu về tài khoản.</p>
+          <Link to="/documents" className="btn-primary">
+            Mua tài liệu ngay
           </Link>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {orders.map(order => (
-            <div key={order.id} style={{
-              background: 'rgba(15,23,42,0.8)',
-              border: order.status === 'PENDING_PAYMENT'
-                ? '1px solid rgba(245,158,11,0.3)'
-                : '1px solid rgba(99,102,241,0.1)',
-              borderRadius: 16, overflow: 'hidden'
+            <article key={order.id} style={{
+              background: '#ffffff',
+              border: order.status === 'PENDING_PAYMENT' ? '1px solid #fed7aa' : '1px solid #dbe6f3',
+              borderRadius: 8,
+              overflow: 'hidden',
+              boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
             }}>
-              {/* Order header */}
               <div style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                flexWrap: 'wrap', gap: 12,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 12,
                 padding: '16px 20px',
-                background: order.status === 'PENDING_PAYMENT'
-                  ? 'rgba(245,158,11,0.05)'
-                  : 'rgba(255,255,255,0.02)',
-                borderBottom: '1px solid rgba(255,255,255,0.06)'
+                background: order.status === 'PENDING_PAYMENT' ? '#fff7e8' : '#f8fbff',
+                borderBottom: '1px solid #dbe6f3',
               }}>
                 <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
                   <div>
-                    <p style={{ color: '#64748b', fontSize: 11, margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Mã đơn</p>
-                    <p style={{ color: '#a5b4fc', fontWeight: 700, margin: 0, fontFamily: 'monospace', fontSize: 14 }}>
-                      #{order.orderCode}
-                    </p>
+                    <p style={{ color: '#8a9aac', fontSize: 11, margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>Mã đơn</p>
+                    <p style={{ color: '#2563eb', fontWeight: 900, margin: 0, fontFamily: 'monospace', fontSize: 14 }}>#{order.orderCode}</p>
                   </div>
                   <div>
-                    <p style={{ color: '#64748b', fontSize: 11, margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Ngày đặt</p>
-                    <p style={{ color: '#94a3b8', fontWeight: 500, margin: 0, fontSize: 13 }}>
-                      {formatDate(order.createdAt)}
-                    </p>
+                    <p style={{ color: '#8a9aac', fontSize: 11, margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>Ngày đặt</p>
+                    <p style={{ color: '#526274', fontWeight: 700, margin: 0, fontSize: 13 }}>{formatDate(order.createdAt)}</p>
                   </div>
                   <div>
-                    <p style={{ color: '#64748b', fontSize: 11, margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tổng tiền</p>
-                    <p style={{ color: '#a5b4fc', fontWeight: 700, margin: 0, fontSize: 15 }}>
-                      {formatPrice(order.finalAmount)}
-                    </p>
+                    <p style={{ color: '#8a9aac', fontSize: 11, margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>Tổng tiền</p>
+                    <p style={{ color: '#132033', fontWeight: 900, margin: 0, fontSize: 15 }}>{formatPrice(order.finalAmount)}</p>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <StatusBadge status={order.status}/>
-
-                  {/* Nút tiếp tục thanh toán cho PENDING_PAYMENT */}
                   {order.status === 'PENDING_PAYMENT' && (
-                    <button
-                      onClick={() => handleContinuePayment(order.orderCode)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '8px 16px', borderRadius: 8,
-                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                        border: 'none', color: '#fff',
-                        cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                        boxShadow: '0 2px 8px rgba(245,158,11,0.3)'
-                      }}
-                    >
+                    <button onClick={() => handleContinuePayment(order.orderCode)} className="btn-primary" style={{ padding: '9px 14px', fontSize: 13 }}>
                       <CreditCard size={14}/> Thanh toán ngay
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Order items */}
               <div style={{ padding: '12px 20px' }}>
                 {order.items?.map((item, idx) => (
                   <div key={item.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '12px 0',
-                    borderBottom: idx < order.items.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none'
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 14,
+                    padding: '13px 0',
+                    borderBottom: idx < order.items.length - 1 ? '1px solid #edf2f8' : 'none',
+                    flexWrap: 'wrap',
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      {/* Thumbnail */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
                       <div style={{
-                        width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0,
-                        background: 'rgba(99,102,241,0.1)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        width: 54,
+                        height: 54,
+                        borderRadius: 8,
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                        background: '#eef6ff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#2563eb',
                       }}>
                         {item.document?.thumbnailPath ? (
-                          <img
-                            src={(getUploadUrl(item.document.thumbnailPath) || "")}
-                            alt={item.document?.title}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          />
+                          <img src={getUploadUrl(item.document.thumbnailPath) || ''} alt={item.document?.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <span style={{ fontSize: 22 }}>📄</span>
+                          <Package size={24}/>
                         )}
                       </div>
-                      <div>
-                        <p style={{ color: '#e2e8f0', fontWeight: 600, margin: 0, fontSize: 14 }}>
-                          {item.document?.title || 'Sản phẩm'}
-                        </p>
-                        <p style={{ color: '#64748b', margin: 0, fontSize: 12 }}>
-                          {formatPrice(item.price)} × {item.quantity}
-                        </p>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ color: '#132033', fontWeight: 900, margin: 0, fontSize: 14 }}>{item.document?.title || 'Sản phẩm'}</p>
+                        <p style={{ color: '#526274', margin: '4px 0 0', fontSize: 12 }}>{formatPrice(item.price)} x {item.quantity}</p>
                       </div>
                     </div>
 
-                    {/* Nút tải xuống — chỉ cho đơn PAID */}
                     {order.status === 'PAID' && (
-                      <button
-                        onClick={() => handleDownload(item.document.id, item.document.title)}
-                        disabled={downloading === item.document.id}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          padding: '8px 16px', borderRadius: 8,
-                          background: downloading === item.document.id ? 'rgba(16,185,129,0.1)' : 'rgba(16,185,129,0.15)',
-                          border: '1px solid rgba(16,185,129,0.3)',
-                          color: '#10b981', cursor: downloading === item.document.id ? 'wait' : 'pointer',
-                          fontSize: 13, fontWeight: 600
-                        }}
-                      >
+                      <button onClick={() => handleDownload(item.document.id, item.document.title)} disabled={downloading === item.document.id} className="btn-secondary" style={{ padding: '8px 14px', fontSize: 13, color: '#0f766e', borderColor: '#b7eadc' }}>
                         <Download size={14}/>
                         {downloading === item.document.id ? 'Đang tải...' : 'Tải xuống'}
                       </button>
@@ -265,11 +235,11 @@ const MyOrdersPage = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

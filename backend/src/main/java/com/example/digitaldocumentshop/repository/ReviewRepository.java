@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+    List<Review> findByIsHiddenFalseOrderByCreatedAtDesc();
     List<Review> findByDocumentIdAndIsHiddenFalse(Long documentId);
     Optional<Review> findByUserIdAndDocumentId(Long userId, Long documentId);
     Optional<Review> findByUserIdAndDocumentIdAndOrderId(Long userId, Long documentId, Long orderId);

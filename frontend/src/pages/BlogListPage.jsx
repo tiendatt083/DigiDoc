@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
-import { Calendar, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, Calendar } from 'lucide-react';
 
 const formatDate = (str) =>
   str ? new Date(str).toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+
+const clamp = (lines) => ({
+  display: '-webkit-box',
+  WebkitLineClamp: lines,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+});
 
 export default function BlogListPage() {
   const [blogs, setBlogs] = useState([]);
@@ -19,115 +26,83 @@ export default function BlogListPage() {
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', gap: 12 }}>
       <div className="spinner" style={{ width: 32, height: 32 }}/>
-      <span style={{ color: '#94a3b8' }}>Đang tải...</span>
+      <span style={{ color: '#526274' }}>Đang tải bài viết...</span>
     </div>
   );
 
   return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
-          borderRadius: 20, padding: '6px 16px', marginBottom: 16,
-          color: '#a5b4fc', fontSize: 13, fontWeight: 600
-        }}>
-          <BookOpen size={14}/> Blog & Tài nguyên
-        </div>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: '#f1f5f9', margin: '0 0 12px' }}>
-          Kiến thức & Hướng dẫn
+    <main style={{ maxWidth: 1100, margin: '0 auto', padding: '46px 24px 78px' }}>
+      <header style={{ textAlign: 'center', marginBottom: 42 }}>
+        <span className="pill pill-indigo" style={{ marginBottom: 14 }}>
+          <BookOpen size={13}/> Blog & tài nguyên
+        </span>
+        <h1 style={{ fontSize: 'clamp(32px,4vw,46px)', fontWeight: 900, color: '#132033', margin: '0 0 12px', letterSpacing: 0 }}>
+          Kiến thức và hướng dẫn học tập
         </h1>
-        <p style={{ color: '#64748b', fontSize: 16, margin: 0 }}>
-          Chia sẻ kiến thức, mẹo học tập và tài nguyên hữu ích
+        <p style={{ color: '#526274', fontSize: 16, margin: '0 auto', maxWidth: 620, lineHeight: 1.7 }}>
+          Chia sẻ mẹo học tập, tài nguyên hữu ích và kinh nghiệm chọn tài liệu hiệu quả.
         </p>
-      </div>
+      </header>
 
       {blogs.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-          <BookOpen size={48} style={{ marginBottom: 16, opacity: 0.3 }}/>
-          <p>Chưa có bài viết nào. Hãy quay lại sau!</p>
+        <div style={{
+          textAlign: 'center',
+          padding: '64px 20px',
+          color: '#526274',
+          background: '#ffffff',
+          border: '1px solid #dbe6f3',
+          borderRadius: 8,
+          boxShadow: '0 14px 34px rgba(27,55,100,0.08)',
+        }}>
+          <BookOpen size={50} color="#9ab0cb" style={{ marginBottom: 16 }}/>
+          <h2 style={{ color: '#132033', fontSize: 20, fontWeight: 900, margin: '0 0 8px' }}>Chưa có bài viết</h2>
+          <p style={{ margin: 0 }}>Hãy quay lại sau để xem các bài chia sẻ mới từ DiGiDoc.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(290px,1fr))', gap: 22 }}>
           {blogs.map(blog => (
-            <Link
-              key={blog.id}
-              to={`/blog/${blog.slug}`}
-              style={{ textDecoration: 'none' }}
-            >
-              <article style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: 18, overflow: 'hidden',
-                transition: 'all 0.25s',
-                cursor: 'pointer',
-                height: '100%'
-              }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)';
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(99,102,241,0.15)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {/* Thumbnail */}
-                {blog.thumbnail ? (
-                  <img
-                    src={blog.thumbnail} alt={blog.title}
-                    style={{ width: '100%', height: 180, objectFit: 'cover' }}
-                    onError={e => { e.target.style.display = 'none'; }}
-                  />
-                ) : (
-                  <div style={{
-                    height: 180, background: 'linear-gradient(135deg, #1e1b4b, #312e81)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}>
-                    <BookOpen size={48} style={{ color: 'rgba(99,102,241,0.4)' }}/>
-                  </div>
-                )}
-
-                <div style={{ padding: '20px' }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    color: '#64748b', fontSize: 12, marginBottom: 10
-                  }}>
-                    <Calendar size={12}/>
-                    {formatDate(blog.createdAt)}
-                  </div>
-                  <h2 style={{
-                    fontSize: 16, fontWeight: 700, color: '#f1f5f9',
-                    margin: '0 0 10px', lineHeight: 1.4,
-                    display: '-webkit-box', WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical', overflow: 'hidden'
-                  }}>
-                    {blog.title}
-                  </h2>
-                  {blog.metaDescription && (
-                    <p style={{
-                      color: '#64748b', fontSize: 13, margin: '0 0 16px',
-                      lineHeight: 1.6, display: '-webkit-box',
-                      WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-                    }}>
-                      {blog.metaDescription}
-                    </p>
-                  )}
-                  <span style={{
-                    color: '#6366f1', fontSize: 13, fontWeight: 600,
-                    display: 'flex', alignItems: 'center', gap: 4
-                  }}>
-                    Đọc tiếp →
-                  </span>
+            <Link key={blog.id} to={`/blog/${blog.slug}`} className="glass-card" style={{ overflow: 'hidden', textDecoration: 'none', display: 'block' }}>
+              {blog.thumbnail ? (
+                <img
+                  src={blog.thumbnail}
+                  alt={blog.title}
+                  style={{ width: '100%', height: 190, objectFit: 'cover' }}
+                  onError={e => { e.currentTarget.style.display = 'none'; }}
+                />
+              ) : (
+                <div style={{
+                  height: 190,
+                  background: 'linear-gradient(135deg,#e8f1ff,#e8fbf5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#2563eb',
+                }}>
+                  <BookOpen size={46}/>
                 </div>
+              )}
+
+              <article style={{ padding: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#8a9aac', fontSize: 12, marginBottom: 10 }}>
+                  <Calendar size={13}/>
+                  {formatDate(blog.createdAt)}
+                </div>
+                <h2 style={{ fontSize: 18, fontWeight: 900, color: '#132033', margin: '0 0 10px', lineHeight: 1.45, ...clamp(2) }}>
+                  {blog.title}
+                </h2>
+                {blog.metaDescription && (
+                  <p style={{ color: '#526274', fontSize: 13, margin: '0 0 16px', lineHeight: 1.65, ...clamp(3) }}>
+                    {blog.metaDescription}
+                  </p>
+                )}
+                <span style={{ color: '#2563eb', fontSize: 13, fontWeight: 900, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  Đọc tiếp <ArrowRight size={14}/>
+                </span>
               </article>
             </Link>
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 }

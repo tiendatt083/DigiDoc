@@ -3,6 +3,7 @@ package com.example.digitaldocumentshop.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -90,6 +91,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/api/blogs/**").permitAll()
                     .requestMatchers("/api/flash-sales/active").permitAll()
                     .requestMatchers("/api/vouchers/apply").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/reviews").permitAll()
                     .requestMatchers("/api/reviews/document/**").permitAll()
                     .requestMatchers("/api/payments/webhook/**").permitAll()  // SePay webhook
                     .requestMatchers("/api/payments/qr/**").authenticated()

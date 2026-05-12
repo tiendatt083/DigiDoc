@@ -1,226 +1,486 @@
 import { Link } from 'react-router-dom';
 import { getUploadUrl } from '../config/env';
-import { ArrowRight, BookOpen, Zap, ShieldCheck, Star, Users, Download, TrendingUp } from 'lucide-react';
+import {
+    ArrowRight,
+    BookOpen,
+    Calendar,
+    CheckCircle2,
+    Download,
+    GraduationCap,
+    MessageSquare,
+    Search,
+    ShieldCheck,
+    Sparkles,
+    Star,
+    TrendingUp,
+    Users,
+    Zap,
+} from 'lucide-react';
 import { useAuthStore } from '../context/authStore';
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
 
-const StatItem = ({ value, label, icon: Icon }) => (
-    <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 32, fontWeight: 900, background: 'linear-gradient(135deg,#a5b4fc,#06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            {value}
+const page = {
+    maxWidth: 1200,
+    margin: '0 auto',
+    paddingLeft: 24,
+    paddingRight: 24,
+};
+
+const sectionTitle = {
+    fontSize: 30,
+    fontWeight: 900,
+    color: '#132033',
+    margin: 0,
+    lineHeight: 1.25,
+};
+
+const mutedText = {
+    color: '#526274',
+    lineHeight: 1.7,
+};
+
+const clamp = (lines) => ({
+    display: '-webkit-box',
+    WebkitLineClamp: lines,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+});
+
+const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p || 0);
+const formatDate = (str) => str ? new Date(str).toLocaleDateString('vi-VN') : '';
+
+const StatItem = ({ value, label, icon: Icon, tone }) => (
+    <div style={{
+        background: '#ffffff',
+        border: '1px solid #dbe6f3',
+        borderRadius: 8,
+        padding: '18px 20px',
+        minWidth: 150,
+        boxShadow: '0 12px 30px rgba(27,55,100,0.08)',
+    }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <span style={{
+                width: 34,
+                height: 34,
+                borderRadius: 8,
+                background: tone.bg,
+                color: tone.color,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <Icon size={17} />
+            </span>
+            <span style={{ color: '#8a9aac', fontSize: 12, fontWeight: 800, textTransform: 'uppercase' }}>{label}</span>
         </div>
-        <div style={{ color: '#64748b', fontSize: 13, marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-            <Icon size={13} /> {label}
-        </div>
+        <div style={{ color: '#132033', fontSize: 28, fontWeight: 900, lineHeight: 1 }}>{value}</div>
     </div>
 );
 
-const FeatureCard = ({ icon: Icon, title, desc, color }) => (
-    <div className="glass-card" style={{ padding: 28, textAlign: 'center' }}>
-        <div style={{
-            width: 56, height: 56, borderRadius: 16,
-            background: `linear-gradient(135deg, ${color}22, ${color}44)`,
-            border: `1px solid ${color}44`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', color
-        }}>
-            <Icon size={24} />
+const SectionHeader = ({ eyebrow, title, desc, actionTo, actionLabel, icon: Icon = Sparkles }) => (
+    <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        gap: 18,
+        marginBottom: 26,
+        flexWrap: 'wrap',
+    }}>
+        <div>
+            <span className="pill pill-indigo" style={{ marginBottom: 12 }}>
+                <Icon size={12} /> {eyebrow}
+            </span>
+            <h2 style={sectionTitle}>{title}</h2>
+            {desc && <p style={{ ...mutedText, marginTop: 8, maxWidth: 560 }}>{desc}</p>}
         </div>
-        <h3 style={{ fontWeight: 700, fontSize: 16, color: '#f1f5f9', marginBottom: 8 }}>{title}</h3>
-        <p style={{ color: '#64748b', fontSize: 13, lineHeight: 1.7 }}>{desc}</p>
+        {actionTo && (
+            <Link to={actionTo} className="btn-secondary" style={{ padding: '10px 18px', fontSize: 13 }}>
+                {actionLabel} <ArrowRight size={15} />
+            </Link>
+        )}
     </div>
+);
+
+const DocumentCard = ({ doc }) => {
+    const price = doc.salePrice != null ? doc.salePrice : doc.price;
+
+    return (
+        <Link to={`/documents/${doc.slug}`} className="product-card">
+            <div className="card-thumb" style={{ height: 176, background: '#eef6ff' }}>
+                {doc.thumbnailPath ? (
+                    <img src={getUploadUrl(doc.thumbnailPath) || ''} alt={doc.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#93a4bb' }}>
+                        <BookOpen size={42} />
+                    </div>
+                )}
+                {doc.salePrice != null && (
+                    <span style={{
+                        position: 'absolute',
+                        top: 10,
+                        left: 10,
+                        background: '#f43f5e',
+                        color: '#fff',
+                        fontSize: 10,
+                        fontWeight: 900,
+                        padding: '4px 8px',
+                        borderRadius: 6,
+                    }}>
+                        SALE
+                    </span>
+                )}
+                {doc.categoryName && (
+                    <span style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        background: '#ffffff',
+                        color: '#1d4ed8',
+                        border: '1px solid #bfdbfe',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        padding: '4px 9px',
+                        borderRadius: 6,
+                    }}>
+                        {doc.categoryName}
+                    </span>
+                )}
+            </div>
+            <div style={{ padding: 18, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ color: '#132033', fontWeight: 900, fontSize: 15, lineHeight: 1.45, marginBottom: 8, ...clamp(2) }}>
+                    {doc.title}
+                </h3>
+                <p style={{ color: '#526274', fontSize: 13, lineHeight: 1.6, marginBottom: 16, flex: 1, ...clamp(2) }}>
+                    {doc.shortDescription || 'Tài liệu học tập được biên soạn gọn, dễ đọc và dễ áp dụng.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div>
+                        <span style={{ color: doc.salePrice != null ? '#e11d48' : '#2563eb', fontWeight: 900, fontSize: 16 }}>
+                            {formatPrice(price)}
+                        </span>
+                        {doc.salePrice != null && (
+                            <span style={{ color: '#8a9aac', fontSize: 12, textDecoration: 'line-through', marginLeft: 6 }}>
+                                {formatPrice(doc.price)}
+                            </span>
+                        )}
+                    </div>
+                    <div style={{ color: '#f59e0b', fontSize: 12, display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Star size={13} fill="currentColor" />
+                        <span style={{ color: '#526274', fontWeight: 800 }}>{doc.averageRating?.toFixed(1) || '4.8'}</span>
+                    </div>
+                </div>
+            </div>
+        </Link>
+    );
+};
+
+const FeatureCard = ({ icon: Icon, title, desc, tone }) => (
+    <article className="glass-card" style={{ padding: 22 }}>
+        <div style={{
+            width: 44,
+            height: 44,
+            borderRadius: 8,
+            background: tone.bg,
+            color: tone.color,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 16,
+        }}>
+            <Icon size={22} />
+        </div>
+        <h3 style={{ color: '#132033', fontSize: 16, fontWeight: 900, marginBottom: 8 }}>{title}</h3>
+        <p style={{ ...mutedText, fontSize: 13, margin: 0 }}>{desc}</p>
+    </article>
+);
+
+const BlogCard = ({ blog }) => (
+    <Link to={`/blog/${blog.slug}`} className="glass-card" style={{ overflow: 'hidden', textDecoration: 'none', display: 'block' }}>
+        {blog.thumbnail ? (
+            <img src={blog.thumbnail} alt={blog.title} style={{ width: '100%', height: 178, objectFit: 'cover' }} />
+        ) : (
+            <div style={{
+                height: 178,
+                background: 'linear-gradient(135deg,#e8f1ff,#e8fbf5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#2563eb',
+            }}>
+                <BookOpen size={44} />
+            </div>
+        )}
+        <div style={{ padding: 18 }}>
+            <div style={{ color: '#8a9aac', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Calendar size={12} /> {formatDate(blog.createdAt)}
+            </div>
+            <h3 style={{ color: '#132033', fontSize: 17, lineHeight: 1.45, fontWeight: 900, margin: '0 0 10px', ...clamp(2) }}>
+                {blog.title}
+            </h3>
+            <p style={{ color: '#526274', fontSize: 13, lineHeight: 1.65, margin: 0, ...clamp(3) }}>
+                {blog.metaDescription || 'Bài viết chia sẻ kiến thức, tài nguyên và kinh nghiệm học tập từ DiGiDoc.'}
+            </p>
+        </div>
+    </Link>
+);
+
+const ReviewCard = ({ review }) => (
+    <article className="glass-card" style={{ padding: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, marginBottom: 12 }}>
+            <div style={{ minWidth: 0 }}>
+                <div style={{ color: '#132033', fontSize: 14, fontWeight: 900, ...clamp(1) }}>
+                    {review.user?.fullName || 'Khách hàng DiGiDoc'}
+                </div>
+                {review.document?.slug ? (
+                    <Link to={`/documents/${review.document.slug}`} style={{ color: '#2563eb', fontSize: 12, textDecoration: 'none', fontWeight: 700, ...clamp(1) }}>
+                        {review.document.title}
+                    </Link>
+                ) : (
+                    <div style={{ color: '#8a9aac', fontSize: 12 }}>Đánh giá tài liệu</div>
+                )}
+            </div>
+            <div style={{ color: '#f59e0b', whiteSpace: 'nowrap', fontSize: 12 }}>
+                {'★'.repeat(review.rating || 0)}
+            </div>
+        </div>
+        <p style={{ color: '#526274', fontSize: 13, lineHeight: 1.7, margin: 0, ...clamp(4) }}>
+            {review.comment || 'Khách hàng đã đánh giá tích cực về tài liệu này.'}
+        </p>
+        {review.adminReply && (
+            <div style={{ marginTop: 14, padding: 12, borderRadius: 8, background: '#eef6ff', border: '1px solid #dbeafe' }}>
+                <div style={{ color: '#1d4ed8', fontSize: 12, fontWeight: 900, marginBottom: 5 }}>Phản hồi từ DiGiDoc</div>
+                <p style={{ color: '#526274', fontSize: 12, lineHeight: 1.6, margin: 0, ...clamp(3) }}>{review.adminReply}</p>
+            </div>
+        )}
+    </article>
 );
 
 const HomePage = () => {
     const { user } = useAuthStore();
     const [featuredDocs, setFeaturedDocs] = useState([]);
-    const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
+    const [blogs, setBlogs] = useState([]);
+    const [reviews, setReviews] = useState([]);
+    const [reviewsExpanded, setReviewsExpanded] = useState(false);
+    const visibleReviews = reviewsExpanded ? reviews : reviews.slice(0, 6);
 
     useEffect(() => {
-        api.get('/documents').then(r => setFeaturedDocs((r.data || []).slice(0, 4))).catch(() => {});
+        Promise.allSettled([
+            api.get('/documents'),
+            api.get('/blogs'),
+            api.get('/reviews'),
+        ]).then(([docsRes, blogsRes, reviewsRes]) => {
+            if (docsRes.status === 'fulfilled') {
+                setFeaturedDocs((docsRes.value.data || []).slice(0, 4));
+            }
+            if (blogsRes.status === 'fulfilled') {
+                setBlogs((blogsRes.value.data || []).slice(0, 3));
+            }
+            if (reviewsRes.status === 'fulfilled') {
+                setReviews(reviewsRes.value.data || []);
+            }
+        });
     }, []);
 
     return (
-        <div style={{ position: 'relative', zIndex: 1 }}>
-
-            {/* ── HERO ── */}
-            <section style={{ paddingTop: 100, paddingBottom: 80, textAlign: 'center', position: 'relative' }}>
-                {/* decorative orbs */}
+        <div>
+            <section style={{
+                background: 'linear-gradient(180deg,#ffffff 0%,#f6f9ff 62%,#eef6ff 100%)',
+                borderBottom: '1px solid #dbe6f3',
+            }}>
                 <div style={{
-                    position: 'absolute', top: '10%', left: '10%',
-                    width: 300, height: 300,
-                    background: 'radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%)',
-                    filter: 'blur(40px)', pointerEvents: 'none'
-                }} />
-                <div style={{
-                    position: 'absolute', top: '20%', right: '8%',
-                    width: 250, height: 250,
-                    background: 'radial-gradient(circle, rgba(6,182,212,0.12), transparent 70%)',
-                    filter: 'blur(40px)', pointerEvents: 'none'
-                }} />
-
-                <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
-                    {/* badge */}
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 28 }}>
-                        <span className="pill pill-indigo">
-                            <Star size={11} fill="currentColor" /> Nền tảng học liệu số #1 Việt Nam
+                    ...page,
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0,1.02fr) minmax(340px,0.78fr)',
+                    gap: 42,
+                    alignItems: 'center',
+                    paddingTop: 72,
+                    paddingBottom: 70,
+                }}>
+                    <div>
+                        <span className="pill pill-gold" style={{ marginBottom: 18 }}>
+                            <GraduationCap size={13} /> Học nhanh hơn, chọn tài liệu đúng hơn
                         </span>
-                    </div>
-
-                    <h1 style={{ fontSize: 'clamp(36px, 6vw, 70px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, letterSpacing: '-1px' }}>
-                        Tài Liệu Học Tập<br />
-                        <span className="gradient-text">Chất Lượng Cao</span><br />
-                        Cho Mọi Cấp Học
-                    </h1>
-
-                    <p style={{ fontSize: 18, color: '#94a3b8', maxWidth: 580, margin: '0 auto 40px', lineHeight: 1.75 }}>
-                        Hàng nghìn tài liệu ôn tập, đề thi, giáo trình từ các giảng viên hàng đầu.
-                        Tải ngay — học thật nhanh.
-                    </p>
-
-                    <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <Link to="/documents" className="btn-primary" style={{ fontSize: 15, padding: '14px 32px' }}>
-                            Khám Phá Tài Liệu <ArrowRight size={18} />
-                        </Link>
-                        {!user && (
-                            <Link to="/register" className="btn-secondary" style={{ fontSize: 15, padding: '14px 28px' }}>
-                                Đăng Ký Miễn Phí
+                        <h1 style={{
+                            color: '#132033',
+                            fontSize: 'clamp(38px, 5.4vw, 66px)',
+                            lineHeight: 1.08,
+                            fontWeight: 900,
+                            margin: 0,
+                            letterSpacing: 0,
+                        }}>
+                            Kho tài liệu số cho <span className="gradient-text">học tập và công việc</span>
+                        </h1>
+                        <p style={{ ...mutedText, fontSize: 18, maxWidth: 650, margin: '22px 0 30px' }}>
+                            DiGiDoc giúp học sinh, sinh viên và người đi làm tìm tài liệu ôn tập, giáo trình, đề thi và mẫu biểu chuyên nghiệp trong vài thao tác.
+                        </p>
+                        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 30 }}>
+                            <Link to="/documents" className="btn-primary" style={{ padding: '14px 26px' }}>
+                                Khám phá tài liệu <ArrowRight size={18} />
                             </Link>
-                        )}
+                            {!user && (
+                                <Link to="/register" className="btn-secondary" style={{ padding: '14px 24px' }}>
+                                    Tạo tài khoản miễn phí
+                                </Link>
+                            )}
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                            {['Tải ngay sau thanh toán', 'Có đánh giá thật', 'Tài liệu kiểm duyệt'].map(label => (
+                                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#526274', fontSize: 13, fontWeight: 700 }}>
+                                    <CheckCircle2 size={15} color="#16a34a" /> {label}
+                                </span>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Stats row */}
                     <div style={{
-                        display: 'flex', justifyContent: 'center', gap: 48,
-                        marginTop: 56, paddingTop: 40,
-                        borderTop: '1px solid rgba(255,255,255,0.06)',
-                        flexWrap: 'wrap'
+                        background: '#ffffff',
+                        border: '1px solid #dbe6f3',
+                        borderRadius: 8,
+                        padding: 22,
+                        boxShadow: '0 24px 70px rgba(27,55,100,0.14)',
                     }}>
-                        <StatItem value="5,000+" label="Tài liệu" icon={BookOpen} />
-                        <StatItem value="12,000+" label="Học viên" icon={Users} />
-                        <StatItem value="98%" label="Hài lòng" icon={Star} />
-                        <StatItem value="24/7" label="Truy cập" icon={Download} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', border: '1px solid #dbe6f3', borderRadius: 8, marginBottom: 16, background: '#f8fbff' }}>
+                            <Search size={17} color="#2563eb" />
+                            <span style={{ color: '#8a9aac', fontSize: 13 }}>Tìm: đề thi, giáo trình, CV, kế toán...</span>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                            {(featuredDocs.length ? featuredDocs.slice(0, 4) : [
+                                { title: 'Đề ôn tập học kỳ', categoryName: 'Ôn thi' },
+                                { title: 'Mẫu báo cáo thực tập', categoryName: 'Đại học' },
+                                { title: 'Bộ slide thuyết trình', categoryName: 'Kỹ năng' },
+                                { title: 'Tài liệu công sở', categoryName: 'Đi làm' },
+                            ]).map((item, index) => (
+                                <div key={item.id || item.title} style={{
+                                    minHeight: 118,
+                                    borderRadius: 8,
+                                    border: '1px solid #dbe6f3',
+                                    background: index % 2 === 0 ? '#eef6ff' : '#e8fbf5',
+                                    padding: 14,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                }}>
+                                    <BookOpen size={22} color={index % 2 === 0 ? '#2563eb' : '#0f766e'} />
+                                    <div>
+                                        <div style={{ color: '#132033', fontSize: 13, fontWeight: 900, lineHeight: 1.4, ...clamp(2) }}>{item.title}</div>
+                                        <div style={{ color: '#526274', fontSize: 11, fontWeight: 700, marginTop: 4 }}>{item.categoryName || 'Tài liệu'}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── FEATURED DOCS ── */}
-            {featuredDocs.length > 0 && (
-                <section style={{ padding: '60px 24px', maxWidth: 1200, margin: '0 auto' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32 }}>
-                        <div>
-                            <p className="pill pill-indigo" style={{ marginBottom: 10, display: 'inline-flex' }}>
-                                <TrendingUp size={11} /> Nổi bật tuần này
-                            </p>
-                            <h2 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9' }}>Tài Liệu Được Yêu Thích</h2>
-                        </div>
-                        <Link to="/documents" style={{ color: '#6366f1', fontWeight: 600, fontSize: 14, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                            Xem tất cả <ArrowRight size={15} />
-                        </Link>
-                    </div>
+            <section style={{ ...page, paddingTop: 34 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 14 }}>
+                    <StatItem value="5K+" label="Tài liệu" icon={BookOpen} tone={{ bg: '#e8f1ff', color: '#2563eb' }} />
+                    <StatItem value="12K+" label="Người học" icon={Users} tone={{ bg: '#e8fbf5', color: '#0f766e' }} />
+                    <StatItem value="98%" label="Hài lòng" icon={Star} tone={{ bg: '#fff7e8', color: '#b45309' }} />
+                    <StatItem value="24/7" label="Tải xuống" icon={Download} tone={{ bg: '#fff1f2', color: '#e11d48' }} />
+                </div>
+            </section>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
-                        {featuredDocs.map(doc => (
-                            <Link to={`/documents/${doc.slug}`} key={doc.id} className="product-card">
-                                <div className="card-thumb" style={{ height: 170, background: '#131330' }}>
-                                    {doc.thumbnailPath ? (
-                                        <img src={(getUploadUrl(doc.thumbnailPath) || "")} alt={doc.title}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <BookOpen size={40} color="#2d2d6b" />
-                                        </div>
-                                    )}
-                                    {doc.salePrice != null && (
-                                        <div style={{
-                                            position: 'absolute', top: 10, left: 10,
-                                            background: 'linear-gradient(135deg,#ef4444,#ec4899)',
-                                            color: '#fff', fontSize: 10, fontWeight: 800,
-                                            padding: '3px 8px', borderRadius: 6
-                                        }}>SALE</div>
-                                    )}
-                                    {doc.categoryName && (
-                                        <div style={{
-                                            position: 'absolute', top: 10, right: 10,
-                                            background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
-                                            color: '#a5b4fc', fontSize: 10, fontWeight: 600,
-                                            padding: '3px 8px', borderRadius: 6, border: '1px solid rgba(99,102,241,0.3)'
-                                        }}>{doc.categoryName}</div>
-                                    )}
-                                </div>
-                                <div style={{ padding: 18, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <h3 style={{ fontWeight: 700, fontSize: 14, color: '#f1f5f9', marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                        {doc.title}
-                                    </h3>
-                                    <p style={{ color: '#64748b', fontSize: 12, marginBottom: 14, flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                        {doc.shortDescription || 'Tài liệu học tập chất lượng cao'}
-                                    </p>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div>
-                                            {doc.salePrice != null ? (
-                                                <>
-                                                    <span style={{ color: '#f87171', fontWeight: 800, fontSize: 15 }}>{formatPrice(doc.salePrice)}</span>
-                                                    <span style={{ color: '#475569', fontSize: 11, textDecoration: 'line-through', marginLeft: 6 }}>{formatPrice(doc.price)}</span>
-                                                </>
-                                            ) : (
-                                                <span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 15 }}>{formatPrice(doc.price)}</span>
-                                            )}
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#fbbf24', fontSize: 11 }}>
-                                            {'★'.repeat(Math.round(doc.averageRating || 4))}
-                                            <span style={{ color: '#64748b', marginLeft: 3 }}>({doc.averageRating?.toFixed(1) || '4.0'})</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+            {featuredDocs.length > 0 && (
+                <section style={{ ...page, paddingTop: 70 }}>
+                    <SectionHeader
+                        eyebrow="Nổi bật tuần này"
+                        title="Tài liệu được quan tâm"
+                        desc="Những tài liệu đang được người học xem và mua nhiều nhất."
+                        actionTo="/documents"
+                        actionLabel="Xem tất cả"
+                        icon={TrendingUp}
+                    />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(250px,1fr))', gap: 20 }}>
+                        {featuredDocs.map(doc => <DocumentCard key={doc.id} doc={doc} />)}
                     </div>
                 </section>
             )}
 
-            {/* ── FEATURES ── */}
-            <section style={{ padding: '60px 24px', maxWidth: 1100, margin: '0 auto' }}>
-                <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <h2 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9' }}>Tại Sao Chọn <span className="gradient-text">DiGiDoc</span>?</h2>
-                    <p style={{ color: '#64748b', marginTop: 10, fontSize: 15 }}>Được hàng nghìn học sinh, sinh viên tin dùng mỗi ngày</p>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
-                    <FeatureCard icon={Zap} color="#6366f1" title="Tải Ngay Lập Tức" desc="Truy cập tài liệu ngay sau khi thanh toán. Không cần chờ đợi hay xét duyệt." />
-                    <FeatureCard icon={ShieldCheck} color="#10b981" title="Thanh Toán An Toàn" desc="Thanh toán qua QR ngân hàng, bảo mật tuyệt đối với mã xác nhận tự động." />
-                    <FeatureCard icon={BookOpen} color="#06b6d4" title="Nội Dung Chất Lượng" desc="Tài liệu được kiểm duyệt bởi đội ngũ chuyên môn trước khi đăng bán." />
-                    <FeatureCard icon={Star} color="#f59e0b" title="Tích Điểm Thưởng" desc="Mua tài liệu và tích lũy điểm thưởng để nhận ưu đãi ở những lần mua tiếp theo." />
+            <section style={{ ...page, paddingTop: 72 }}>
+                <SectionHeader
+                    eyebrow="Lý do nên chọn"
+                    title="Trải nghiệm mua tài liệu gọn và đáng tin"
+                    desc="Giao diện, thanh toán và tải file được thiết kế cho người cần học nhanh, làm nhanh."
+                />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 18 }}>
+                    <FeatureCard icon={Zap} title="Tải ngay lập tức" desc="Sau thanh toán, tài liệu nằm trong tài khoản và có thể tải lại bất kỳ lúc nào." tone={{ bg: '#e8f1ff', color: '#2563eb' }} />
+                    <FeatureCard icon={ShieldCheck} title="Thanh toán rõ ràng" desc="Theo dõi trạng thái đơn hàng, mã chuyển khoản và lịch sử mua trên cùng một tài khoản." tone={{ bg: '#e8fbf5', color: '#0f766e' }} />
+                    <FeatureCard icon={BookOpen} title="Dễ tìm đúng tài liệu" desc="Bộ lọc, danh mục và mô tả ngắn giúp chọn nhanh thứ bạn cần trước khi mua." tone={{ bg: '#fff7e8', color: '#b45309' }} />
+                    <FeatureCard icon={Star} title="Đánh giá minh bạch" desc="Người mua có thể đánh giá tài liệu để người sau lựa chọn tự tin hơn." tone={{ bg: '#fff1f2', color: '#e11d48' }} />
                 </div>
             </section>
 
-            {/* ── CTA ── */}
             {!user && (
-                <section style={{ padding: '60px 24px', textAlign: 'center' }}>
+                <section style={{ ...page, paddingTop: 72 }}>
                     <div style={{
-                        maxWidth: 680, margin: '0 auto',
-                        padding: '48px 40px',
-                        background: 'linear-gradient(135deg, rgba(99,102,241,0.1), rgba(6,182,212,0.06))',
-                        border: '1px solid rgba(99,102,241,0.2)',
-                        borderRadius: 24,
-                        position: 'relative', overflow: 'hidden'
+                        background: 'linear-gradient(135deg,#2563eb,#14b8a6)',
+                        borderRadius: 8,
+                        padding: '34px 32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 24,
+                        flexWrap: 'wrap',
+                        boxShadow: '0 24px 55px rgba(37,99,235,0.18)',
                     }}>
-                        <div style={{
-                            position: 'absolute', top: -60, right: -60,
-                            width: 200, height: 200,
-                            background: 'radial-gradient(circle, rgba(99,102,241,0.15), transparent)',
-                            borderRadius: '50%'
-                        }} />
-                        <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>
-                            Bắt Đầu Học Tập <span className="gradient-text">Thông Minh Hơn</span> Ngay Hôm Nay
-                        </h2>
-                        <p style={{ color: '#94a3b8', marginBottom: 28, fontSize: 15 }}>
-                            Tạo tài khoản miễn phí và khám phá hàng nghìn tài liệu học tập chất lượng.
-                        </p>
-                        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <Link to="/register" className="btn-primary">Đăng Ký Miễn Phí <ArrowRight size={16} /></Link>
-                            <Link to="/documents" className="btn-secondary">Xem Tài Liệu</Link>
+                        <div>
+                            <h2 style={{ color: '#ffffff', fontSize: 28, fontWeight: 900, margin: 0 }}>Bắt đầu xây kho tài liệu của bạn</h2>
+                            <p style={{ color: 'rgba(255,255,255,0.84)', margin: '8px 0 0', maxWidth: 620, lineHeight: 1.7 }}>
+                                Tạo tài khoản để lưu đơn hàng, tải tài liệu và nhận điểm thưởng khi mua.
+                            </p>
                         </div>
+                        <Link to="/register" className="btn-primary" style={{ background: '#ffffff', color: '#1d4ed8', boxShadow: 'none' }}>
+                            Đăng ký miễn phí <ArrowRight size={16} />
+                        </Link>
                     </div>
+                </section>
+            )}
+
+            {(blogs.length > 0 || reviews.length > 0) && (
+                <section style={{ ...page, paddingTop: 72, paddingBottom: 84 }}>
+                    {blogs.length > 0 && (
+                        <div style={{ marginBottom: 58 }}>
+                            <SectionHeader
+                                eyebrow="Blog DiGiDoc"
+                                title="Bài viết mới nhất"
+                                desc="Gợi ý học tập, tài nguyên và kinh nghiệm giúp bạn dùng tài liệu hiệu quả hơn."
+                                actionTo="/blog"
+                                actionLabel="Xem blog"
+                                icon={BookOpen}
+                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(270px,1fr))', gap: 20 }}>
+                                {blogs.map(blog => <BlogCard key={blog.id} blog={blog} />)}
+                            </div>
+                        </div>
+                    )}
+
+                    {reviews.length > 0 && (
+                        <div>
+                            <SectionHeader
+                                eyebrow="Phản hồi khách hàng"
+                                title="Đánh giá của cửa hàng"
+                                desc="Những nhận xét mới nhất từ người đã mua tài liệu trên DiGiDoc."
+                                icon={MessageSquare}
+                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16 }}>
+                                {visibleReviews.map(review => <ReviewCard key={review.id} review={review} />)}
+                            </div>
+                            {reviews.length > 6 && (
+                                <div style={{ textAlign: 'center', marginTop: 22 }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setReviewsExpanded(prev => !prev)}
+                                        className="btn-secondary"
+                                        style={{ padding: '10px 18px', fontSize: 13 }}
+                                    >
+                                        {reviewsExpanded ? 'Ẩn bớt' : `Hiển thị thêm ${reviews.length - 6} đánh giá`}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </section>
             )}
         </div>
