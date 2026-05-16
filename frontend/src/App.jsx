@@ -36,6 +36,7 @@ import AdminVouchersPage from './pages/admin/AdminVouchersPage';
 import AdminBlogsPage from './pages/admin/AdminBlogsPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminReviewsPage from './pages/admin/AdminReviewsPage';
+import AdminTrashPage from './pages/admin/AdminTrashPage';
 
 // Protected Route
 const ProtectedRoute = ({ children }) => {
@@ -92,6 +93,7 @@ function App() {
           <Route path="vouchers" element={<AdminVouchersPage />} />
           <Route path="blogs" element={<AdminBlogsPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
+          <Route path="trash" element={<AdminTrashPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

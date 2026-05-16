@@ -104,8 +104,8 @@ const AdminReviewsPage = () => {
                   <td>
                     {replyingTo === r.id ? (
                       <div className="flex flex-col gap-2">
-                        <textarea 
-                          value={replyText[r.id] || r.adminReply || ''} 
+                        <textarea
+                          value={replyText[r.id] || r.adminReply || ''}
                           onChange={(e) => setReplyText({ ...replyText, [r.id]: e.target.value })}
                           className="text-sm border border-slate-300 rounded p-2"
                           rows={2}
@@ -138,15 +138,15 @@ const AdminReviewsPage = () => {
                   </td>
                   <td className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
-                        onClick={() => handleToggleHide(r.id)} 
+                      <button
+                        onClick={() => handleToggleHide(r.id)}
                         className="p-1.5 rounded hover:bg-slate-100 text-slate-600"
                         title={r.isHidden ? "Hiển thị" : "Ẩn"}
                       >
                         {r.isHidden ? <Eye size={18} /> : <EyeOff size={18} />}
                       </button>
-                      <button 
-                        onClick={() => handleDelete(r.id)} 
+                      <button
+                        onClick={() => handleDelete(r.id)}
                         className="p-1.5 rounded hover:bg-rose-100 text-rose-600"
                         title="Xóa"
                       >

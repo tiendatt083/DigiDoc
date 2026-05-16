@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../context/authStore';
 import {
   LayoutDashboard, FileText, ShoppingBag, Users, LogOut,
-  Tag, BookOpen, Home, ChevronRight, Star
+  Tag, BookOpen, Home, ChevronRight, Star, Trash2
 } from 'lucide-react';
 
 const PREVIEW_ITEMS = [
@@ -18,6 +18,7 @@ const MANAGEMENT_ITEMS = [
   { label: 'Voucher', path: '/admin/vouchers', icon: Tag },
   { label: 'Blog', path: '/admin/blogs', icon: BookOpen },
   { label: 'Đánh giá', path: '/admin/reviews', icon: Star },
+  { label: 'Thùng rác', path: '/admin/trash', icon: Trash2, danger: true },
 ];
 
 const AdminLayout = () => {
@@ -67,12 +68,12 @@ const AdminLayout = () => {
           ))}
 
           <p className="nav-section-label nav-section-label-spaced">QUẢN TRỊ</p>
-          {MANAGEMENT_ITEMS.map(({ label, path, icon: Icon, exact }) => (
+          {MANAGEMENT_ITEMS.map(({ label, path, icon: Icon, exact, danger }) => (
             <NavLink
               key={path}
               to={path}
               end={exact}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''} ${danger ? 'nav-link-danger' : ''}`}
             >
               <Icon size={18}/>
               <span>{label}</span>

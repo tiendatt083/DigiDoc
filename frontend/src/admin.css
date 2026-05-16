@@ -186,6 +186,24 @@
   color: #f87171;
 }
 
+.nav-link-danger {
+  color: #fca5a5 !important;
+  opacity: 0.75;
+}
+
+.nav-link-danger:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+  opacity: 1;
+}
+
+.nav-link-danger.active {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
+  opacity: 1;
+}
+
 .nav-arrow {
   margin-left: auto;
   opacity: 0.4;

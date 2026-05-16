@@ -13,6 +13,11 @@ export const adminGetAllDocuments = () => api.get('/admin/documents');
 export const adminCreateDocument = (formData) => api.post('/admin/documents', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const adminUpdateDocument = (id, formData) => api.put(`/admin/documents/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const adminDeleteDocument = (id) => api.delete(`/admin/documents/${id}`);
+export const adminRestoreDocument = (id) => {
+  const fd = new FormData();
+  fd.append('status', 'ACTIVE');
+  return api.put(`/admin/documents/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+};
 
 // ====================
 // Categories
