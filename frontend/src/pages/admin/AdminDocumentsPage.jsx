@@ -195,17 +195,20 @@ export default function AdminDocumentsPage() {
   };
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`Xoá tài liệu "${title}"? (Xoá mềm - tài liệu sẽ bị ẩn)`)) return;
+    if (!window.confirm(`Xoá tài liệu "${title}"?\nKhách hàng đã mua vẫn tải về được.`)) return;
     try {
       await adminDeleteDocument(id);
+      // Xoá mềm: ẩn khỏi danh sách admin ngay lập tức, không cần fetch lại
+      setDocuments(prev => prev.filter(d => d.id !== id));
       toast.success('Đã xoá tài liệu');
-      fetchData();
     } catch {
       toast.error('Không thể xoá tài liệu');
     }
   };
 
+  // Loại bỏ tài liệu đã xoá mềm (HIDDEN) khỏi danh sách admin
   const filtered = documents.filter(d =>
+    d.status !== 'HIDDEN' &&
     d.title?.toLowerCase().includes(search.toLowerCase())
   );
 
